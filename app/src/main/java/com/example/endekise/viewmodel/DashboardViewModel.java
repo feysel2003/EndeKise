@@ -30,4 +30,7 @@ public class DashboardViewModel extends AndroidViewModel {
     // Helper methods for the UI to save data
     public void insertAccount(Account account) { repository.insertAccount(account); }
     public void insertTransaction(Transaction transaction) { repository.insertTransaction(transaction); }
+    public LiveData<Double> getTotalAmount() {
+        return repository.getTotalAmount();
+    }
 }

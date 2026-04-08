@@ -39,21 +39,30 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
         Transaction currentTx = transactions.get(position);
 
-        // Set Note (or show "No Note" if empty)
+        // Set Note
         if (currentTx.getNote() == null || currentTx.getNote().isEmpty()) {
-            holder.textNote.setText("Expense");
+            holder.textNote.setText("Transaction");
         } else {
             holder.textNote.setText(currentTx.getNote());
         }
 
-        // Set Amount
-        holder.textAmount.setText(String.format(Locale.getDefault(), "ETB %.2f", currentTx.getAmount()));
-
-        // Set Date (Converting from long timestamp to readable string)
+        // Set Date
         Date date = new Date(currentTx.getDateTimestamp());
         holder.textDate.setText(dateFormat.format(date));
-    }
 
+        // COLOR CODING LOGIC!
+        double amount = currentTx.getAmount();
+        if (amount < 0) {
+            // It's an Expense (Red)
+            holder.textAmount.setTextColor(android.graphics.Color.parseColor("#D32F2F")); // Red
+            // Format to show positive number in the string since we add the "-" manually
+            holder.textAmount.setText(String.format(Locale.getDefault(), "- ETB %.2f", Math.abs(amount)));
+        } else {
+            // It's an Income (Green)
+            holder.textAmount.setTextColor(android.graphics.Color.parseColor("#388E3C")); // Green
+            holder.textAmount.setText(String.format(Locale.getDefault(), "+ ETB %.2f", amount));
+        }
+    }
     @Override
     public int getItemCount() {
         return transactions.size();

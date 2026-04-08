@@ -1,12 +1,10 @@
 package com.example.endekise.ui;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -18,6 +16,7 @@ import com.example.endekise.R;
 import com.example.endekise.entity.Transaction;
 import com.example.endekise.viewmodel.DashboardViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class AddTransactionBottomSheet extends BottomSheetDialogFragment {
@@ -34,14 +33,15 @@ public class AddTransactionBottomSheet extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Get the ViewModel from the main activity so we can save to the database
         viewModel = new ViewModelProvider(requireActivity()).get(DashboardViewModel.class);
 
         TextInputEditText editTextAmount = view.findViewById(R.id.editTextAmount);
         TextInputEditText editTextNote = view.findViewById(R.id.editTextNote);
         Button buttonSave = view.findViewById(R.id.buttonSaveTransaction);
 
-        // --- FRICTIONLESS ENTRY: Auto-focus and pop up keyboard ---
+        // Find our new Toggle Group
+        MaterialButtonToggleGroup toggleGroup = view.findViewById(R.id.toggleGroupType);
+
         editTextAmount.requestFocus();
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
@@ -55,17 +55,20 @@ public class AddTransactionBottomSheet extends BottomSheetDialogFragment {
             }
 
             double amount = Double.parseDouble(amountStr);
+
+            // MAGIC LOGIC: If "Expense" is selected, turn the amount negative!
+            if (toggleGroup.getCheckedButtonId() == R.id.buttonExpense) {
+                amount = amount * -1;
+            }
+
             long currentTime = System.currentTimeMillis();
 
-            // Create a new Transaction!
-            // (Note: accountId is hardcoded to 1 for now. We will add a wallet selector later)
+            // Save the transaction
             Transaction newTransaction = new Transaction(1, amount, currentTime, note, "General", 0.0, 0.0, true);
-
-            // Save it to the SQLite database via our ViewModel
             viewModel.insertTransaction(newTransaction);
 
-            Toast.makeText(getContext(), "Expense saved!", Toast.LENGTH_SHORT).show();
-            dismiss(); // Close the bottom sheet
+            Toast.makeText(getContext(), "Saved successfully!", Toast.LENGTH_SHORT).show();
+            dismiss();
         });
     }
 }

@@ -19,6 +19,9 @@ public abstract class TransactionDao {
     @Query("SELECT * FROM transactions ORDER BY dateTimestamp DESC")
     public abstract LiveData<List<com.example.endekise.entity.Transaction>> getAllTransactions();
 
+    // 3. Get the total sum of all transactions
+    @Query("SELECT SUM(amount) FROM transactions")
+    public abstract LiveData<Double> getTotalAmount();
     // 3. THE ENTERPRISE FEATURE: ACID Compliant Account Transfer
     // If the phone crashes exactly between deducting the Bank and adding to Cash,
     // the @Transaction annotation guarantees the whole operation rolls back. No money lost!

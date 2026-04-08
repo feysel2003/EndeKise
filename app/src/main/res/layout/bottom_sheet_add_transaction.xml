@@ -10,7 +10,39 @@
 
     <TextView
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <!-- Income / Expense Toggle -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggleGroupType"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:singleSelection="true"
+        app:checkedButton="@+id/buttonExpense">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonExpense"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Expense"
+            android:textColor="#D32F2F"
+            app:strokeColor="#D32F2F" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonIncome"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Income"
+            android:textColor="#388E3C"
+            app:strokeColor="#388E3C" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
         android:text="Quick Add Expense"
         android:textSize="20sp"
         android:textStyle="bold"

@@ -46,4 +46,7 @@ public class AppRepository {
     public void insertTransaction(Transaction transaction) {
         executorService.execute(() -> transactionDao.insertTransaction(transaction));
     }
+    public LiveData<Double> getTotalAmount() {
+        return transactionDao.getTotalAmount();
+    }
 }
