@@ -1,0 +1,36 @@
+package com.example.endekise.dao;
+
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Insert;
+import androidx.room.Query;
+import androidx.room.Transaction; // Room's ACID annotation
+
+import java.util.List;
+
+@Dao
+public abstract class TransactionDao {
+
+    // 1. Log a new expense or income
+    @Insert
+    public abstract void insertTransaction(com.example.endekise.entity.Transaction transaction);
+
+    // 2. Get all history sorted by newest first
+    @Query("SELECT * FROM transactions ORDER BY dateTimestamp DESC")
+    public abstract LiveData<List<com.example.endekise.entity.Transaction>> getAllTransactions();
+
+    // 3. THE ENTERPRISE FEATURE: ACID Compliant Account Transfer
+    // If the phone crashes exactly between deducting the Bank and adding to Cash,
+    // the @Transaction annotation guarantees the whole operation rolls back. No money lost!
+    @Transaction
+    public void executeTransfer(int fromAccountId, int toAccountId, double amount, AccountDao accountDao) {
+
+        // Deduct money from the sender account (e.g., Bank)
+        accountDao.updateBalance(fromAccountId, -amount);
+
+        // Add money to the receiving account (e.g., Cash Wallet)
+        accountDao.updateBalance(toAccountId, amount);
+
+        // (In the future, we will also log the transfer history here)
+    }
+}
