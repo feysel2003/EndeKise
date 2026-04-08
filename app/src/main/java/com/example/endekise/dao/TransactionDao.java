@@ -36,4 +36,17 @@ public abstract class TransactionDao {
 
         // (In the future, we will also log the transfer history here)
     }
+    @androidx.room.Delete
+    public abstract void deleteTransaction(com.example.endekise.entity.Transaction transaction);
+    // --- TRUE LEDGER LOGIC ---
+    // This saves the transaction AND updates the wallet balance instantly.
+    @Transaction
+    public void insertTransactionAndUpdateAccount(com.example.endekise.entity.Transaction transaction, AccountDao accountDao) {
+        // 1. Save the receipt
+        insertTransaction(transaction);
+
+        // 2. Add or subtract the money from the specific wallet!
+        // (If the amount is negative, adding it will naturally subtract it)
+        accountDao.updateBalance(transaction.getAccountId(), transaction.getAmount());
+    }
 }

@@ -41,6 +41,16 @@
             android:textColor="#388E3C"
             app:strokeColor="#388E3C" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonTransfer"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Transfer"
+            android:textColor="#1976D2"
+            app:strokeColor="#1976D2" />
+
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
         android:text="Quick Add Expense"
@@ -77,6 +87,40 @@
             android:layout_height="wrap_content"
             android:hint="What was it for? (Optional)"
             android:inputType="textCapSentences"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Wallet / Account Dropdown -->
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:hint="Select Wallet">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/dropdownWallet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:textColor="@android:color/black"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- TO Wallet (Only shows during Transfers) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutWalletTo"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:visibility="gone"
+        android:hint="To Wallet">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/dropdownWalletTo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            android:textColor="@android:color/black"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton

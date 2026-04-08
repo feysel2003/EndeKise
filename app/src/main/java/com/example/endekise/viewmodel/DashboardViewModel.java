@@ -33,4 +33,10 @@ public class DashboardViewModel extends AndroidViewModel {
     public LiveData<Double> getTotalAmount() {
         return repository.getTotalAmount();
     }
+    public void deleteTransaction(Transaction transaction) {
+        repository.deleteTransaction(transaction);
+    }
+    public void executeTransfer(int fromAccountId, int toAccountId, double amount) {
+        repository.executeTransfer(fromAccountId, toAccountId, amount);
+    }
 }

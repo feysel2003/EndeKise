@@ -44,9 +44,21 @@ public class AppRepository {
     }
 
     public void insertTransaction(Transaction transaction) {
-        executorService.execute(() -> transactionDao.insertTransaction(transaction));
+        // Now it calls our new ultra-safe ledger method!
+        executorService.execute(() ->
+                transactionDao.insertTransactionAndUpdateAccount(transaction, accountDao)
+        );
     }
     public LiveData<Double> getTotalAmount() {
         return transactionDao.getTotalAmount();
+    }
+    public void deleteTransaction(Transaction transaction) {
+        executorService.execute(() -> transactionDao.deleteTransaction(transaction));
+    }
+
+    public void executeTransfer(int fromAccountId, int toAccountId, double amount) {
+        executorService.execute(() ->
+                transactionDao.executeTransfer(fromAccountId, toAccountId, amount, accountDao)
+        );
     }
 }

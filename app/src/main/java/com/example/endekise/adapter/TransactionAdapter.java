@@ -20,6 +20,7 @@ import java.util.Locale;
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
 
     private List<Transaction> transactions = new ArrayList<>();
+    private List<com.example.endekise.entity.Account> accounts = new ArrayList<>();
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
 
     // This updates the list automatically when new data is added
@@ -28,6 +29,14 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         notifyDataSetChanged(); // Refreshes the UI
     }
 
+    public void setAccounts(List<com.example.endekise.entity.Account> accounts) {
+        this.accounts = accounts;
+        notifyDataSetChanged();
+    }
+
+    public Transaction getTransactionAt(int position) {
+        return transactions.get(position);
+    }
     @NonNull
     @Override
     public TransactionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -40,11 +49,21 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         Transaction currentTx = transactions.get(position);
 
         // Set Note
-        if (currentTx.getNote() == null || currentTx.getNote().isEmpty()) {
-            holder.textNote.setText("Transaction");
-        } else {
-            holder.textNote.setText(currentTx.getNote());
+        // --- Find the Wallet Name ---
+        String walletName = "Unknown Wallet";
+        for (com.example.endekise.entity.Account acc : accounts) {
+            if (acc.getAccountId() == currentTx.getAccountId()) {
+                walletName = acc.getName();
+                break;
+            }
         }
+
+        // --- Set Note & Wallet Name ---
+        String noteText = currentTx.getNote();
+        if (noteText == null || noteText.isEmpty()) {
+            noteText = "Transaction";
+        }
+        holder.textNote.setText(walletName + " • " + noteText);
 
         // Set Date
         Date date = new Date(currentTx.getDateTimestamp());
