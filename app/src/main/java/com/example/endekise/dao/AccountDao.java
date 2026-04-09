@@ -17,6 +17,8 @@ public interface AccountDao {
     @Insert
     void insertAccount(Account account);
 
+    @androidx.room.Delete
+    void deleteAccount(Account account);
     // 2. Get all wallets (LiveData means the UI updates instantly if a balance changes!)
     @Query("SELECT * FROM accounts")
     LiveData<List<Account>> getAllAccounts();
@@ -24,4 +26,5 @@ public interface AccountDao {
     // 3. Update the balance when money is spent or added
     @Query("UPDATE accounts SET currentBalance = currentBalance + :amount WHERE accountId = :accountId")
     void updateBalance(int accountId, double amount);
+
 }

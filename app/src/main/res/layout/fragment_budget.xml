@@ -14,7 +14,7 @@
         android:orientation="vertical"
         android:paddingTop="16dp">
 
-        <!-- 1. THE TOP USER ROW (Matches Home Screen) -->
+        <!-- 1. THE TOP USER ROW (Profile, Title, Bell) -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -78,72 +78,20 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- Month Selector -->
                 <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&lt;" android:textColor="#212121" android:textSize="18sp" android:textStyle="bold"/>
                     <TextView android:id="@+id/textMonthYear" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true" android:text="April 2024" android:textColor="#212121" android:textSize="16sp" android:textStyle="bold"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="&gt;" android:textColor="#212121" android:textSize="18sp" android:textStyle="bold"/>
                 </RelativeLayout>
 
-                <!-- Days List (Static mock to match design) -->
-                <LinearLayout
+                <!-- The Sliding Calendar List -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewCalendar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:orientation="horizontal"
-                    android:weightSum="7"
-                    android:layout_marginTop="16dp">
-
-                    <!-- Day 1 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="M" android:textColor="#9E9E9E" android:textSize="12sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="20" android:textColor="#212121" android:textStyle="bold" android:layout_marginTop="8dp"/>
-                    </LinearLayout>
-                    <!-- Day 2 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="T" android:textColor="#9E9E9E" android:textSize="12sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="21" android:textColor="#212121" android:textStyle="bold" android:layout_marginTop="8dp"/>
-                    </LinearLayout>
-                    <!-- Day 3 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="W" android:textColor="#9E9E9E" android:textSize="12sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="22" android:textColor="#212121" android:textStyle="bold" android:layout_marginTop="8dp"/>
-                        <View android:layout_width="4dp" android:layout_height="4dp" android:background="@drawable/ic_launcher_background" android:backgroundTint="#E0E0E0" android:layout_marginTop="4dp"/>
-                    </LinearLayout>
-                    <!-- Day 4 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="T" android:textColor="#9E9E9E" android:textSize="12sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="23" android:textColor="#212121" android:textStyle="bold" android:layout_marginTop="8dp"/>
-                        <View android:layout_width="4dp" android:layout_height="4dp" android:background="@drawable/ic_launcher_background" android:backgroundTint="#E0E0E0" android:layout_marginTop="4dp"/>
-                    </LinearLayout>
-
-                    <!-- Day 5 (ACTIVE DAY - ORANGE PILL) -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="0dp"
-                        android:id="@+id/btnActiveDay"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="0dp"
-                        app:cardBackgroundColor="#FF6D00"
-                        android:layout_marginHorizontal="4dp"
-                        android:paddingVertical="8dp">
-                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center" android:paddingVertical="8dp">
-                            <TextView android:id="@+id/textActiveDayName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="F" android:textColor="#FFF3E0" android:textSize="12sp"/>
-                            <TextView android:id="@+id/textActiveDayNumber" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="24" android:textColor="#FFFFFF" android:textStyle="bold" android:layout_marginTop="8dp"/>
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Day 6 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="S" android:textColor="#9E9E9E" android:textSize="12sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="25" android:textColor="#212121" android:textStyle="bold" android:layout_marginTop="8dp"/>
-                    </LinearLayout>
-                    <!-- Day 7 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="S" android:textColor="#9E9E9E" android:textSize="12sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="26" android:textColor="#212121" android:textStyle="bold" android:layout_marginTop="8dp"/>
-                    </LinearLayout>
-                </LinearLayout>
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -205,69 +153,35 @@
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
-        <!-- 4. EXPENSES CATEGORY TRACKER HEADER -->
+        <!-- 4. EXPENSES CATEGORY HEADER -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginTop="32dp">
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="12dp">
+
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Expenses" android:textSize="18sp" android:textStyle="bold" android:textColor="@android:color/black"/>
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="View All" android:textSize="14sp" android:textColor="#9E9E9E"/>
+
+            <!-- VIEW ALL BUTTON (Java will click this!) -->
+            <TextView
+                android:id="@+id/btnViewAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:text="View All"
+                android:textSize="14sp"
+                android:textColor="#9E9E9E"/>
         </RelativeLayout>
 
-        <!-- CATEGORY PROGRESS CARD (Food and Drinks) -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- 5. THE MODERN CATEGORY LIST -->
+        <!-- This automatically generates a budget card for EVERY category -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewCategories"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="12dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="#FFFFFF">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-                <!-- Header: Icon & Category Name -->
-                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp">
-                    <ImageView android:id="@+id/iconFood" android:layout_width="32dp" android:layout_height="32dp" android:src="@android:drawable/ic_menu_agenda" app:tint="#FF6D00" android:layout_centerVertical="true"/>
-                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toEndOf="@id/iconFood" android:layout_marginStart="12dp" android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Food And Drinks" android:textColor="#212121" android:textStyle="bold" android:textSize="16sp"/>
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Credit Card" android:textColor="#9E9E9E" android:textSize="12sp"/>
-                    </LinearLayout>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true" android:text="April, 2024" android:textColor="#9E9E9E" android:textSize="12sp"/>
-                </RelativeLayout>
-
-                <!-- Spend vs Limit Text -->
-                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Spend" android:textColor="#757575"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true" android:text="Total Budget" android:textColor="#757575"/>
-                </RelativeLayout>
-
-                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp">
-                    <TextView android:id="@+id/textSpend" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ETB 0" android:textColor="#00C853" android:textSize="16sp" android:textStyle="bold"/>
-                    <TextView android:id="@+id/textLimit" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true" android:text="ETB 5,000" android:textColor="#212121" android:textSize="16sp" android:textStyle="bold"/>
-                    <TextView android:id="@+id/textPercentage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="0%" android:textColor="#00C853" android:textSize="14sp" android:textStyle="bold"/>
-                </RelativeLayout>
-
-                <!-- Purple Progress Bar -->
-                <com.google.android.material.progressindicator.LinearProgressIndicator
-                    android:id="@+id/budgetProgressBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    app:trackThickness="10dp"
-                    app:trackCornerRadius="5dp"
-                    app:indicatorColor="#7C4DFF"
-                    app:trackColor="#EDE7F6"
-                    android:max="5000"
-                    android:progress="0"/>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            android:nestedScrollingEnabled="false" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

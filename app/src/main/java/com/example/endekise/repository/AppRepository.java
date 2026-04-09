@@ -80,4 +80,7 @@ public class AppRepository {
 
     public LiveData<Double> getTotalIncome() { return transactionDao.getTotalIncome(); }
     public LiveData<Double> getTotalExpense() { return transactionDao.getTotalExpense(); }
+    public void deleteAccount(Account account) {
+        executorService.execute(() -> accountDao.deleteAccount(account));
+    }
 }

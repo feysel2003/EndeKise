@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="20dp"
+    android:layout_marginBottom="16dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp">
+            <!-- Icon -->
+            <ImageView android:id="@+id/iconCategory" android:layout_width="32dp" android:layout_height="32dp" android:src="@android:drawable/ic_menu_agenda" app:tint="#FF6D00" android:layout_centerVertical="true"/>
+
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toEndOf="@id/iconCategory" android:layout_marginStart="12dp" android:orientation="vertical">
+                <TextView android:id="@+id/textCategoryName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Food And Drinks" android:textColor="#212121" android:textStyle="bold" android:textSize="16sp"/>
+                <TextView android:id="@+id/textCategoryType" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Expense" android:textColor="#9E9E9E" android:textSize="12sp"/>
+            </LinearLayout>
+
+            <!-- Dynamic Date -->
+            <TextView android:id="@+id/textCategoryDate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="April, 2024" android:textColor="#9E9E9E" android:textSize="12sp"/>
+        </RelativeLayout>
+
+        <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Spend" android:textColor="#757575"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true" android:text="Total Budget" android:textColor="#757575"/>
+        </RelativeLayout>
+
+        <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp">
+            <TextView android:id="@+id/textSpend" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ETB 0" android:textColor="#00C853" android:textSize="16sp" android:textStyle="bold"/>
+            <TextView android:id="@+id/textLimit" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true" android:text="ETB 5,000" android:textColor="#212121" android:textSize="16sp" android:textStyle="bold"/>
+            <TextView android:id="@+id/textPercentage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="0%" android:textColor="#7C4DFF" android:textSize="14sp" android:textStyle="bold"/>
+        </RelativeLayout>
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/budgetProgressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:trackThickness="10dp"
+            app:trackCornerRadius="5dp"
+            app:indicatorColor="#7C4DFF"
+            app:trackColor="#EDE7F6"
+            android:max="5000"
+            android:progress="0"/>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

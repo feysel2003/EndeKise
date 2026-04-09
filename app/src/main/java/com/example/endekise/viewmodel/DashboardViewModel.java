@@ -53,4 +53,7 @@ public class DashboardViewModel extends AndroidViewModel {
 
     public LiveData<Double> getTotalIncome() { return repository.getTotalIncome(); }
     public LiveData<Double> getTotalExpense() { return repository.getTotalExpense(); }
+    public void deleteAccount(Account account) {
+        repository.deleteAccount(account);
+    }
 }

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="#F8F9FA"
     android:clipToPadding="false"
     android:paddingBottom="100dp">
 
@@ -22,7 +22,6 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp">
 
-            <!-- Fake Profile Picture (Purple Circle) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/imgProfile"
                 android:layout_width="40dp"
@@ -38,7 +37,6 @@
                     app:tint="#FFFFFF"/>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Screen Title -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -48,7 +46,6 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <!-- Notification Bell -->
             <ImageView
                 android:id="@+id/btnNotifications"
                 android:layout_width="28dp"
@@ -58,7 +55,6 @@
                 android:src="@android:drawable/ic_popup_reminder"
                 app:tint="#757575" />
 
-            <!-- Little Red Notification Dot -->
             <View
                 android:layout_width="8dp"
                 android:layout_height="8dp"
@@ -69,67 +65,115 @@
                 android:backgroundTint="#FF3D00"/>
         </RelativeLayout>
 
-        <!-- 2. PREMIUM CREDIT CARD HEADER -->
+        <!-- 2. THE NEW UNIFIED WEALTH CARD (Matches Design!) -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="220dp"
+            android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
             android:layout_marginBottom="16dp"
             app:cardCornerRadius="24dp"
-            app:cardElevation="12dp"
-            app:cardBackgroundColor="#1A1A2E">
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="#7C4DFF"> <!-- Vibrant Purple -->
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:padding="24dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:text="•••"
-                    android:textColor="#FFFFFF"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                <!-- Top Row: Title and Menu -->
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/labelTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total Balance ˅"
+                        android:textColor="#E8EAF6"
+                        android:textSize="14sp" />
 
-                <TextView
-                    android:id="@+id/labelTotal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Total Balance"
-                    android:textColor="#A0A0B0"
-                    android:textSize="14sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="•••"
+                        android:textColor="#FFFFFF"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+                </RelativeLayout>
 
+                <!-- Total Balance Amount -->
                 <TextView
                     android:id="@+id/textTotalBalance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/labelTotal"
                     android:text="ETB 0.00"
                     android:textColor="#FFFFFF"
                     android:textSize="36sp"
                     android:textStyle="bold"
                     android:layout_marginTop="8dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- Bottom Row: Income & Expense Split -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:text="2644   7545   3867   1965"
-                    android:textColor="#A0A0B0"
-                    android:textSize="14sp"
-                    android:letterSpacing="0.1" />
+                    android:orientation="horizontal"
+                    android:layout_marginTop="32dp"
+                    android:weightSum="2">
 
-                <RelativeLayout
-                    android:layout_width="50dp"
-                    android:layout_height="30dp"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentEnd="true">
-                    <com.google.android.material.card.MaterialCardView android:layout_width="30dp" android:layout_height="30dp" app:cardCornerRadius="15dp" app:cardElevation="0dp" app:cardBackgroundColor="#EB001B" />
-                    <com.google.android.material.card.MaterialCardView android:layout_width="30dp" android:layout_height="30dp" android:layout_alignParentEnd="true" app:cardCornerRadius="15dp" app:cardElevation="0dp" app:cardBackgroundColor="#F79E1B" android:alpha="0.8"/>
-                </RelativeLayout>
-            </RelativeLayout>
+                    <!-- INCOME SECTION -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                            <!-- Circular Down Arrow -->
+                            <com.google.android.material.card.MaterialCardView android:layout_width="24dp" android:layout_height="24dp" app:cardCornerRadius="12dp" app:cardBackgroundColor="#9FA8DA" app:cardElevation="0dp" android:alpha="0.8">
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:text="↓" android:textColor="#FFFFFF" android:textStyle="bold" android:textSize="14sp"/>
+                            </com.google.android.material.card.MaterialCardView>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:text="Income" android:textColor="#E8EAF6" android:textSize="14sp"/>
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/textCardIncome"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="ETB 0.00"
+                            android:textColor="#FFFFFF"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- EXPENSE SECTION -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                            <!-- Circular Up Arrow -->
+                            <com.google.android.material.card.MaterialCardView android:layout_width="24dp" android:layout_height="24dp" app:cardCornerRadius="12dp" app:cardBackgroundColor="#CE93D8" app:cardElevation="0dp" android:alpha="0.8">
+                                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:text="↑" android:textColor="#FFFFFF" android:textStyle="bold" android:textSize="14sp"/>
+                            </com.google.android.material.card.MaterialCardView>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:text="Expenses" android:textColor="#E8EAF6" android:textSize="14sp"/>
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/textCardExpense"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="ETB 0.00"
+                            android:textColor="#FFFFFF"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
         <!-- 3. ANALYTICS HEADER WITH ORANGE BUTTON -->
@@ -138,7 +182,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="8dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -155,6 +199,8 @@
                 android:layout_height="32dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackground"
                 app:cardCornerRadius="8dp"
                 app:cardBackgroundColor="#FF6D00"
                 app:cardElevation="0dp">
@@ -196,6 +242,7 @@
                 android:textStyle="bold"
                 android:textColor="@android:color/black"/>
 
+            <!-- Added clickability to View All -->
             <TextView
                 android:id="@+id/btnViewAll"
                 android:layout_width="wrap_content"
@@ -203,7 +250,10 @@
                 android:layout_alignParentEnd="true"
                 android:text="View All"
                 android:textSize="14sp"
-                android:textColor="#9E9E9E"/>
+                android:textStyle="bold"
+                android:textColor="#9E9E9E"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"/>
         </RelativeLayout>
 
         <androidx.recyclerview.widget.RecyclerView

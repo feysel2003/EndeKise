@@ -35,9 +35,9 @@ public class HomeFragment extends Fragment {
     private BarChart barChart;
     private TextView textYearFilter;
 
-    // We store the current year and the full list of transactions to easily filter them!
     private int selectedYear = Calendar.getInstance().get(Calendar.YEAR);
     private List<Transaction> allTransactions = new ArrayList<>();
+    private TransactionAdapter adapter;
 
     @Nullable
     @Override
@@ -52,25 +52,22 @@ public class HomeFragment extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(DashboardViewModel.class);
 
         // --- 1. SETUP CLICKABLE UI BUTTONS ---
+        view.findViewById(R.id.imgProfile).setOnClickListener(v -> Toast.makeText(getContext(), "Profile Settings coming soon!", Toast.LENGTH_SHORT).show());
+        view.findViewById(R.id.btnNotifications).setOnClickListener(v -> Toast.makeText(getContext(), "You have 0 new notifications", Toast.LENGTH_SHORT).show());
 
-        MaterialCardView btnProfile = view.findViewById(R.id.imgProfile);
-        btnProfile.setOnClickListener(v -> Toast.makeText(getContext(), "Profile Settings coming soon!", Toast.LENGTH_SHORT).show());
-
-        View btnNotifications = view.findViewById(R.id.btnNotifications);
-        btnNotifications.setOnClickListener(v -> Toast.makeText(getContext(), "You have 0 new notifications", Toast.LENGTH_SHORT).show());
-
-        View btnViewAll = view.findViewById(R.id.btnViewAll);
-        btnViewAll.setOnClickListener(v -> Toast.makeText(getContext(), "Full Ledger opening soon...", Toast.LENGTH_SHORT).show());
+        // "View All" Button Redirect (Will build the full screen next!)
+        view.findViewById(R.id.btnViewAll).setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Redirecting to Full Ledger...", Toast.LENGTH_SHORT).show();
+            // TODO: Navigate to AllTransactionsFragment
+        });
 
         // --- 2. SETUP ORANGE DROPDOWN (YEAR FILTER) ---
-
         MaterialCardView btnYearFilter = view.findViewById(R.id.btnYearFilter);
         textYearFilter = view.findViewById(R.id.textYearFilter);
         textYearFilter.setText("Year - " + selectedYear + " ˅");
 
         btnYearFilter.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(requireContext(), btnYearFilter);
-            // Add the last few years dynamically
             int currentYear = Calendar.getInstance().get(Calendar.YEAR);
             popup.getMenu().add(String.valueOf(currentYear));
             popup.getMenu().add(String.valueOf(currentYear - 1));
@@ -79,23 +76,19 @@ public class HomeFragment extends Fragment {
             popup.setOnMenuItemClickListener(item -> {
                 selectedYear = Integer.parseInt(item.getTitle().toString());
                 textYearFilter.setText("Year - " + selectedYear + " ˅");
-
-                // Recalculate the chart immediately!
                 updateBarChart();
                 return true;
             });
             popup.show();
         });
 
-
         // --- 3. RECYCLER VIEW SETUP ---
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewTransactions);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
-        TransactionAdapter adapter = new TransactionAdapter();
+        adapter = new TransactionAdapter();
         recyclerView.setAdapter(adapter);
 
-        // Setup defaults & swipe to delete
         viewModel.getAllAccounts().observe(getViewLifecycleOwner(), adapter::setAccounts);
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -108,11 +101,19 @@ public class HomeFragment extends Fragment {
         });
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-
-        // --- 4. CREDIT CARD BALANCES ---
+        // --- 4. NEW WEALTH CARD BALANCES ---
         TextView textTotalBalance = view.findViewById(R.id.textTotalBalance);
+        TextView textCardIncome = view.findViewById(R.id.textCardIncome);
+        TextView textCardExpense = view.findViewById(R.id.textCardExpense);
+
         viewModel.getTotalAmount().observe(getViewLifecycleOwner(), total ->
-                textTotalBalance.setText(total != null ? String.format(Locale.getDefault(), "ETB %.2f", total) : "ETB 0.00"));
+                textTotalBalance.setText(total != null ? String.format(Locale.getDefault(), "$%,.2f", total) : "$0.00"));
+
+        viewModel.getTotalIncome().observe(getViewLifecycleOwner(), income ->
+                textCardIncome.setText(income != null ? String.format(Locale.getDefault(), "$%,.2f", income) : "$0.00"));
+
+        viewModel.getTotalExpense().observe(getViewLifecycleOwner(), expense ->
+                textCardExpense.setText(expense != null ? String.format(Locale.getDefault(), "$%,.2f", Math.abs(expense)) : "$0.00"));
 
 
         // --- 5. INITIALIZE BAR CHART SHELL ---
@@ -139,30 +140,32 @@ public class HomeFragment extends Fragment {
         leftAxis.setAxisMinimum(0f);
         barChart.getAxisRight().setEnabled(false);
 
-        // --- 6. OBSERVE TRANSACTIONS & FEED CHART ---
+        // --- 6. OBSERVE TRANSACTIONS (LIST LIMITED TO 3) ---
         viewModel.getAllTransactions().observe(getViewLifecycleOwner(), transactions -> {
-            adapter.setTransactions(transactions); // Update list
-            allTransactions = transactions; // Save locally for our filter
-            updateBarChart(); // Draw chart
+            allTransactions = transactions;
+
+            // Limit the RecyclerView to show ONLY the latest 3 transactions!
+            if (transactions != null && transactions.size() > 3) {
+                adapter.setTransactions(transactions.subList(0, 3));
+            } else {
+                adapter.setTransactions(transactions);
+            }
+
+            updateBarChart();
         });
     }
 
-    // --- THE MAGIC FILTER LOGIC ---
     private void updateBarChart() {
         if (allTransactions == null || allTransactions.isEmpty()) return;
 
         float[] monthlySums = new float[12];
         Calendar cal = Calendar.getInstance();
 
-        // Loop through all data, but ONLY add it to the chart if it matches the selected year!
         for (Transaction t : allTransactions) {
             if (t.getAmount() < 0) {
                 cal.setTimeInMillis(t.getDateTimestamp());
-                int transactionYear = cal.get(Calendar.YEAR);
-
-                if (transactionYear == selectedYear) {
-                    int monthIndex = cal.get(Calendar.MONTH);
-                    monthlySums[monthIndex] += (float) Math.abs(t.getAmount());
+                if (cal.get(Calendar.YEAR) == selectedYear) {
+                    monthlySums[cal.get(Calendar.MONTH)] += (float) Math.abs(t.getAmount());
                 }
             }
         }
@@ -174,8 +177,6 @@ public class HomeFragment extends Fragment {
 
         for (int i = 0; i < 12; i++) {
             entries.add(new com.github.mikephil.charting.data.BarEntry(i, monthlySums[i]));
-
-            // Only highlight Purple if we are looking at the current year AND current month
             if (i == currentMonthIndex && selectedYear == currentYear) {
                 colors.add(android.graphics.Color.parseColor("#7C4DFF"));
             } else {
@@ -196,7 +197,6 @@ public class HomeFragment extends Fragment {
 
         com.github.mikephil.charting.data.BarData barData = new com.github.mikephil.charting.data.BarData(dataSet);
         barData.setBarWidth(0.4f);
-
         barChart.setData(barData);
         barChart.invalidate();
         barChart.animateY(700, com.github.mikephil.charting.animation.Easing.EaseInOutQuad);
