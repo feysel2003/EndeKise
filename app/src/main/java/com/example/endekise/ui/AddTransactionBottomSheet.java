@@ -45,24 +45,32 @@ public class AddTransactionBottomSheet extends BottomSheetDialogFragment {
 
         viewModel = new ViewModelProvider(requireActivity()).get(DashboardViewModel.class);
 
+        // UI Elements
         TextInputEditText editTextAmount = view.findViewById(R.id.editTextAmount);
         TextInputEditText editTextNote = view.findViewById(R.id.editTextNote);
         Button buttonSave = view.findViewById(R.id.buttonSaveTransaction);
         MaterialButtonToggleGroup toggleGroup = view.findViewById(R.id.toggleGroupType);
 
+        // Wallet Dropdowns
         MaterialAutoCompleteTextView dropdownWallet = view.findViewById(R.id.dropdownWallet);
         TextInputLayout layoutWalletTo = view.findViewById(R.id.layoutWalletTo);
         MaterialAutoCompleteTextView dropdownWalletTo = view.findViewById(R.id.dropdownWalletTo);
 
-        // --- DYNAMIC UI: Show/Hide the "To" Wallet ---
+        // Category Dropdowns
+        MaterialAutoCompleteTextView dropdownCategory = view.findViewById(R.id.dropdownCategory);
+        TextInputLayout layoutCategory = view.findViewById(R.id.layoutCategory);
+
+        // --- DYNAMIC UI: Show/Hide Wallets and Categories based on Toggle ---
         toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (isChecked) {
                 if (checkedId == R.id.buttonTransfer) {
-                    layoutWalletTo.setVisibility(View.VISIBLE);
-                    editTextNote.setVisibility(View.GONE); // Hide notes for simple transfers
+                    layoutWalletTo.setVisibility(View.VISIBLE); // Show "To Wallet"
+                    layoutCategory.setVisibility(View.GONE);    // Hide Category
+                    editTextNote.setVisibility(View.GONE);      // Hide Note
                 } else {
-                    layoutWalletTo.setVisibility(View.GONE);
-                    editTextNote.setVisibility(View.VISIBLE);
+                    layoutWalletTo.setVisibility(View.GONE);    // Hide "To Wallet"
+                    layoutCategory.setVisibility(View.VISIBLE); // Show Category
+                    editTextNote.setVisibility(View.VISIBLE);   // Show Note
                 }
             }
         });
@@ -77,7 +85,7 @@ public class AddTransactionBottomSheet extends BottomSheetDialogFragment {
 
             ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, accountNames);
             dropdownWallet.setAdapter(adapter);
-            dropdownWalletTo.setAdapter(adapter); // Give same list to second dropdown
+            dropdownWalletTo.setAdapter(adapter);
 
             if (!accounts.isEmpty()) {
                 dropdownWallet.setText(accounts.get(0).getName(), false);
@@ -88,10 +96,26 @@ public class AddTransactionBottomSheet extends BottomSheetDialogFragment {
         dropdownWallet.setOnItemClickListener((parent, v, position, id) -> selectedFromAccountId = accountList.get(position).getAccountId());
         dropdownWalletTo.setOnItemClickListener((parent, v, position, id) -> selectedToAccountId = accountList.get(position).getAccountId());
 
-        // Keyboard popup
+        // --- FETCH CATEGORIES ---
+        List<String> categoryNames = new ArrayList<>();
+        viewModel.getAllCategories().observe(getViewLifecycleOwner(), categories -> {
+            categoryNames.clear();
+            for (com.example.endekise.entity.Category cat : categories) {
+                categoryNames.add(cat.getName());
+            }
+            ArrayAdapter<String> catAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, categoryNames);
+            dropdownCategory.setAdapter(catAdapter);
+
+            if (!categoryNames.isEmpty()) {
+                dropdownCategory.setText(categoryNames.get(0), false);
+            }
+        });
+
+        // Auto-focus Keyboard
         editTextAmount.requestFocus();
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
+        // --- SAVE BUTTON LOGIC ---
         buttonSave.setOnClickListener(v -> {
             String amountStr = editTextAmount.getText().toString().trim();
             if (amountStr.isEmpty()) {
@@ -101,26 +125,28 @@ public class AddTransactionBottomSheet extends BottomSheetDialogFragment {
 
             double amount = Double.parseDouble(amountStr);
 
-            // LOGIC 1: IS IT A TRANSFER?
+            // LOGIC 1: TRANSFER
             if (toggleGroup.getCheckedButtonId() == R.id.buttonTransfer) {
                 if (selectedToAccountId == -1 || selectedFromAccountId == selectedToAccountId) {
                     Toast.makeText(getContext(), "Please select a different TO wallet", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                // Execute ACID Transfer!
                 viewModel.executeTransfer(selectedFromAccountId, selectedToAccountId, amount);
                 Toast.makeText(getContext(), "Transfer complete!", Toast.LENGTH_SHORT).show();
                 dismiss();
                 return;
             }
 
-            // LOGIC 2: IT IS AN INCOME OR EXPENSE
+            // LOGIC 2: INCOME OR EXPENSE
             if (toggleGroup.getCheckedButtonId() == R.id.buttonExpense) {
-                amount = amount * -1;
+                amount = amount * -1; // Make it negative
             }
 
             String note = editTextNote.getText().toString().trim();
-            Transaction newTransaction = new Transaction(selectedFromAccountId, amount, System.currentTimeMillis(), note, "General", 0.0, 0.0, true);
+            String selectedCategory = dropdownCategory.getText().toString(); // Get selected category here!
+
+            // Create transaction using the selected category instead of "General"
+            Transaction newTransaction = new Transaction(selectedFromAccountId, amount, System.currentTimeMillis(), note, selectedCategory, 0.0, 0.0, true);
             viewModel.insertTransaction(newTransaction);
 
             Toast.makeText(getContext(), "Saved successfully!", Toast.LENGTH_SHORT).show();

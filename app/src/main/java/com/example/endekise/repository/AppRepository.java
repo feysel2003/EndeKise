@@ -23,6 +23,8 @@ public class AppRepository {
     // This ExecutorService acts as our background worker thread so the app doesn't freeze!
     private ExecutorService executorService;
 
+    private com.example.endekise.dao.CategoryDao categoryDao;
+    private LiveData<List<com.example.endekise.entity.Category>> allCategories;
     public AppRepository(Application application) {
         AppDatabase db = AppDatabase.getDatabase(application);
         accountDao = db.accountDao();
@@ -32,6 +34,9 @@ public class AppRepository {
         allTransactions = transactionDao.getAllTransactions();
 
         executorService = Executors.newSingleThreadExecutor();
+
+        categoryDao = db.categoryDao();
+        allCategories = categoryDao.getAllCategories();
     }
 
     // --- READ METHODS (LiveData automatically runs in the background) ---
@@ -60,5 +65,12 @@ public class AppRepository {
         executorService.execute(() ->
                 transactionDao.executeTransfer(fromAccountId, toAccountId, amount, accountDao)
         );
+    }
+
+    public LiveData<List<com.example.endekise.entity.Category>> getAllCategories() {
+        return allCategories;
+    }
+    public void insertCategory(com.example.endekise.entity.Category category) {
+        executorService.execute(() -> categoryDao.insertCategory(category));
     }
 }

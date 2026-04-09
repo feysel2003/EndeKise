@@ -39,4 +39,11 @@ public class DashboardViewModel extends AndroidViewModel {
     public void executeTransfer(int fromAccountId, int toAccountId, double amount) {
         repository.executeTransfer(fromAccountId, toAccountId, amount);
     }
+
+    public LiveData<List<com.example.endekise.entity.Category>> getAllCategories() {
+        return repository.getAllCategories();
+    }
+    public void insertCategory(com.example.endekise.entity.Category category) {
+        repository.insertCategory(category);
+    }
 }

@@ -29,11 +29,11 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract AccountDao accountDao();
     public abstract TransactionDao transactionDao();
+    public abstract com.example.endekise.dao.CategoryDao categoryDao();
 
     private static volatile AppDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;
     public static final ExecutorService databaseWriteExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
-
     public static AppDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
