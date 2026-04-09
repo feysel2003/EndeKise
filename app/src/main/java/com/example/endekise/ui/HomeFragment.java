@@ -55,12 +55,14 @@ public class HomeFragment extends Fragment {
         view.findViewById(R.id.imgProfile).setOnClickListener(v -> Toast.makeText(getContext(), "Profile Settings coming soon!", Toast.LENGTH_SHORT).show());
         view.findViewById(R.id.btnNotifications).setOnClickListener(v -> Toast.makeText(getContext(), "You have 0 new notifications", Toast.LENGTH_SHORT).show());
 
-        // "View All" Button Redirect (Will build the full screen next!)
+        // "View All" Button Redirect to Full Transactions History
         view.findViewById(R.id.btnViewAll).setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Redirecting to Full Ledger...", Toast.LENGTH_SHORT).show();
-            // TODO: Navigate to AllTransactionsFragment
+            getParentFragmentManager().beginTransaction()
+                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                    .replace(R.id.fragment_container, new AllTransactionsFragment())
+                    .addToBackStack(null) // Adds it to the back stack so pressing physical 'back' button takes you back to Home!
+                    .commit();
         });
-
         // --- 2. SETUP ORANGE DROPDOWN (YEAR FILTER) ---
         MaterialCardView btnYearFilter = view.findViewById(R.id.btnYearFilter);
         textYearFilter = view.findViewById(R.id.textYearFilter);
@@ -107,14 +109,13 @@ public class HomeFragment extends Fragment {
         TextView textCardExpense = view.findViewById(R.id.textCardExpense);
 
         viewModel.getTotalAmount().observe(getViewLifecycleOwner(), total ->
-                textTotalBalance.setText(total != null ? String.format(Locale.getDefault(), "$%,.2f", total) : "$0.00"));
+                textTotalBalance.setText(total != null ? String.format(Locale.getDefault(), "ETB %,.2f", total) : "ETB 0.00"));
 
         viewModel.getTotalIncome().observe(getViewLifecycleOwner(), income ->
-                textCardIncome.setText(income != null ? String.format(Locale.getDefault(), "$%,.2f", income) : "$0.00"));
+                textCardIncome.setText(income != null ? String.format(Locale.getDefault(), "ETB %,.2f", income) : "ETB 0.00"));
 
         viewModel.getTotalExpense().observe(getViewLifecycleOwner(), expense ->
-                textCardExpense.setText(expense != null ? String.format(Locale.getDefault(), "$%,.2f", Math.abs(expense)) : "$0.00"));
-
+                textCardExpense.setText(expense != null ? String.format(Locale.getDefault(), "ETB %,.2f", Math.abs(expense)) : "ETB 0.00"));
 
         // --- 5. INITIALIZE BAR CHART SHELL ---
         barChart = view.findViewById(R.id.barChart);
@@ -123,6 +124,7 @@ public class HomeFragment extends Fragment {
         barChart.setDrawGridBackground(false);
         barChart.setDrawBorders(false);
         barChart.setScaleEnabled(false);
+        barChart.setExtraBottomOffset(10f); // Prevents "Jan, Feb" from getting cut off
 
         com.github.mikephil.charting.components.XAxis xAxis = barChart.getXAxis();
         xAxis.setPosition(com.github.mikephil.charting.components.XAxis.XAxisPosition.BOTTOM);
