@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FA"
+    android:clipToPadding="false"
+    android:paddingBottom="100dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="16dp">
+
+        <!-- 1. THE TOP USER ROW (Matches Home Screen) -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="8dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#9575CD">
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@android:drawable/ic_menu_myplaces"
+                    app:tint="#FFFFFF"/>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Expenses"
+                android:textColor="#212121"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@android:drawable/ic_popup_reminder"
+                app:tint="#757575" />
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/ic_launcher_background"
+                android:backgroundTint="#FF3D00"/>
+        </RelativeLayout>
+
+        <!-- 2. THE HORIZONTAL CALENDAR STRIP -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="24dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Month Selector -->
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="&lt;" android:textColor="#212121" android:textSize="18sp" android:textStyle="bold"/>
+                    <TextView android:id="@+id/textMonthYear" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true" android:text="April 2024" android:textColor="#212121" android:textSize="16sp" android:textStyle="bold"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="&gt;" android:textColor="#212121" android:textSize="18sp" android:textStyle="bold"/>
+                </RelativeLayout>
+
+                <!-- Days List (Static mock to match design) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="7"
+                    android:layout_marginTop="16dp">
+
+                    <!-- Day 1 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="M" android:textColor="#9E9E9E" android:textSize="12sp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="20" android:textColor="#212121" android:textStyle="bold" android:layout_marginTop="8dp"/>
+                    </LinearLayout>
+                    <!-- Day 2 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="T" android:textColor="#9E9E9E" android:textSize="12sp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="21" android:textColor="#212121" android:textStyle="bold" android:layout_marginTop="8dp"/>
+                    </LinearLayout>
+                    <!-- Day 3 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="W" android:textColor="#9E9E9E" android:textSize="12sp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="22" android:textColor="#212121" android:textStyle="bold" android:layout_marginTop="8dp"/>
+                        <View android:layout_width="4dp" android:layout_height="4dp" android:background="@drawable/ic_launcher_background" android:backgroundTint="#E0E0E0" android:layout_marginTop="4dp"/>
+                    </LinearLayout>
+                    <!-- Day 4 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="T" android:textColor="#9E9E9E" android:textSize="12sp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="23" android:textColor="#212121" android:textStyle="bold" android:layout_marginTop="8dp"/>
+                        <View android:layout_width="4dp" android:layout_height="4dp" android:background="@drawable/ic_launcher_background" android:backgroundTint="#E0E0E0" android:layout_marginTop="4dp"/>
+                    </LinearLayout>
+
+                    <!-- Day 5 (ACTIVE DAY - ORANGE PILL) -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="0dp"
+                        android:id="@+id/btnActiveDay"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#FF6D00"
+                        android:layout_marginHorizontal="4dp"
+                        android:paddingVertical="8dp">
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center" android:paddingVertical="8dp">
+                            <TextView android:id="@+id/textActiveDayName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="F" android:textColor="#FFF3E0" android:textSize="12sp"/>
+                            <TextView android:id="@+id/textActiveDayNumber" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="24" android:textColor="#FFFFFF" android:textStyle="bold" android:layout_marginTop="8dp"/>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Day 6 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="S" android:textColor="#9E9E9E" android:textSize="12sp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="25" android:textColor="#212121" android:textStyle="bold" android:layout_marginTop="8dp"/>
+                    </LinearLayout>
+                    <!-- Day 7 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="S" android:textColor="#9E9E9E" android:textSize="12sp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="26" android:textColor="#212121" android:textStyle="bold" android:layout_marginTop="8dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 3. THE VIBRANT INCOME & EXPENSE CARDS -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="24dp"
+            android:weightSum="2">
+
+            <!-- PURPLE INCOME CARD -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#7C4DFF">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="16dp">
+
+                    <TextView android:id="@+id/labelIncome" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Salary" android:textColor="#E8EAF6"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="⋮" android:textColor="#FFFFFF" android:textStyle="bold" android:textSize="18sp"/>
+                    <TextView android:id="@+id/textBudgetIncome" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/labelIncome" android:text="ETB 0" android:textColor="#FFFFFF" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
+
+                    <ImageView android:id="@+id/iconCard1" android:layout_width="20dp" android:layout_height="20dp" android:layout_alignParentBottom="true" android:src="@android:drawable/ic_menu_agenda" app:tint="#FFFFFF" android:alpha="0.8"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toEndOf="@id/iconCard1" android:layout_alignParentBottom="true" android:layout_marginStart="8dp" android:text="Bank Account\n**** 1965" android:textColor="#FFFFFF" android:textSize="10sp" android:alpha="0.8"/>
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- ORANGE EXPENSE CARD -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="140dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="#FF6D00">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="16dp">
+
+                    <TextView android:id="@+id/labelExpense" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Expense" android:textColor="#FFF3E0"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="⋮" android:textColor="#FFFFFF" android:textStyle="bold" android:textSize="18sp"/>
+                    <TextView android:id="@+id/textBudgetExpense" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/labelExpense" android:text="ETB 0" android:textColor="#FFFFFF" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
+
+                    <ImageView android:id="@+id/iconCard2" android:layout_width="20dp" android:layout_height="20dp" android:layout_alignParentBottom="true" android:src="@android:drawable/ic_menu_agenda" app:tint="#FFFFFF" android:alpha="0.8"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toEndOf="@id/iconCard2" android:layout_alignParentBottom="true" android:layout_marginStart="8dp" android:text="Bank Account\n**** 1965" android:textColor="#FFFFFF" android:textSize="10sp" android:alpha="0.8"/>
+                </RelativeLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <!-- 4. EXPENSES CATEGORY TRACKER HEADER -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginTop="32dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Expenses" android:textSize="18sp" android:textStyle="bold" android:textColor="@android:color/black"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="View All" android:textSize="14sp" android:textColor="#9E9E9E"/>
+        </RelativeLayout>
+
+        <!-- CATEGORY PROGRESS CARD (Food and Drinks) -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- Header: Icon & Category Name -->
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp">
+                    <ImageView android:id="@+id/iconFood" android:layout_width="32dp" android:layout_height="32dp" android:src="@android:drawable/ic_menu_agenda" app:tint="#FF6D00" android:layout_centerVertical="true"/>
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toEndOf="@id/iconFood" android:layout_marginStart="12dp" android:orientation="vertical">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Food And Drinks" android:textColor="#212121" android:textStyle="bold" android:textSize="16sp"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Credit Card" android:textColor="#9E9E9E" android:textSize="12sp"/>
+                    </LinearLayout>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true" android:text="April, 2024" android:textColor="#9E9E9E" android:textSize="12sp"/>
+                </RelativeLayout>
+
+                <!-- Spend vs Limit Text -->
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Spend" android:textColor="#757575"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true" android:text="Total Budget" android:textColor="#757575"/>
+                </RelativeLayout>
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp">
+                    <TextView android:id="@+id/textSpend" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ETB 0" android:textColor="#00C853" android:textSize="16sp" android:textStyle="bold"/>
+                    <TextView android:id="@+id/textLimit" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true" android:text="ETB 5,000" android:textColor="#212121" android:textSize="16sp" android:textStyle="bold"/>
+                    <TextView android:id="@+id/textPercentage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="0%" android:textColor="#00C853" android:textSize="14sp" android:textStyle="bold"/>
+                </RelativeLayout>
+
+                <!-- Purple Progress Bar -->
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/budgetProgressBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:trackThickness="10dp"
+                    app:trackCornerRadius="5dp"
+                    app:indicatorColor="#7C4DFF"
+                    app:trackColor="#EDE7F6"
+                    android:max="5000"
+                    android:progress="0"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
