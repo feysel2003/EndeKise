@@ -49,4 +49,15 @@ public abstract class TransactionDao {
         // (If the amount is negative, adding it will naturally subtract it)
         accountDao.updateBalance(transaction.getAccountId(), transaction.getAmount());
     }
+
+    // Get the sum of expenses grouped by Category for the Pie Chart
+    @Query("SELECT payee AS categoryName, SUM(amount) AS totalAmount FROM transactions WHERE amount < 0 GROUP BY payee")
+    public abstract LiveData<List<com.example.endekise.entity.CategorySum>> getExpenseSumByCategory();
+
+    @Query("SELECT SUM(amount) FROM transactions WHERE amount > 0")
+    public abstract LiveData<Double> getTotalIncome();
+
+    @Query("SELECT SUM(amount) FROM transactions WHERE amount < 0")
+    public abstract LiveData<Double> getTotalExpense();
+
 }

@@ -46,4 +46,11 @@ public class DashboardViewModel extends AndroidViewModel {
     public void insertCategory(com.example.endekise.entity.Category category) {
         repository.insertCategory(category);
     }
+
+    public LiveData<List<com.example.endekise.entity.CategorySum>> getExpenseSumByCategory() {
+        return repository.getExpenseSumByCategory();
+    }
+
+    public LiveData<Double> getTotalIncome() { return repository.getTotalIncome(); }
+    public LiveData<Double> getTotalExpense() { return repository.getTotalExpense(); }
 }

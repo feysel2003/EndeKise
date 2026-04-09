@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="Home" />
+    <item
+        android:id="@+id/nav_wallets"
+        android:icon="@android:drawable/ic_menu_gallery"
+        android:title="Wallets" />
+
+    <!-- This is a blank placeholder to make room for our Floating Orange Button -->
+    <item
+        android:id="@+id/nav_placeholder"
+        android:title=""
+        android:enabled="false" />
+
+    <item
+        android:id="@+id/nav_budget"
+        android:icon="@android:drawable/ic_menu_today"
+        android:title="Budget" />
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="Settings" />
+</menu>

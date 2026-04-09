@@ -73,4 +73,11 @@ public class AppRepository {
     public void insertCategory(com.example.endekise.entity.Category category) {
         executorService.execute(() -> categoryDao.insertCategory(category));
     }
+
+    public LiveData<List<com.example.endekise.entity.CategorySum>> getExpenseSumByCategory() {
+        return transactionDao.getExpenseSumByCategory();
+    }
+
+    public LiveData<Double> getTotalIncome() { return transactionDao.getTotalIncome(); }
+    public LiveData<Double> getTotalExpense() { return transactionDao.getTotalExpense(); }
 }
