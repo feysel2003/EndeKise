@@ -38,7 +38,7 @@ public class BudgetFragment extends Fragment {
     private List<Calendar> calendarDays = new ArrayList<>();
     private Calendar selectedDate = Calendar.getInstance(); // Default to Today
     private CalendarAdapter calendarAdapter;
-    private CategoryBudgetAdapter categoryAdapter;
+    private CategoryBudgetAdapter categoryAdapter; // We use the Adapter for the list!
 
     @Nullable
     @Override
@@ -79,11 +79,10 @@ public class BudgetFragment extends Fragment {
         // --- 3. THE "VIEW ALL" REDIRECT ---
         TextView btnViewAll = view.findViewById(R.id.btnViewAll);
         btnViewAll.setOnClickListener(v -> {
-            // Redirects to the 3rd screen (TotalExpenseFragment)!
             getParentFragmentManager().beginTransaction()
                     .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                     .replace(R.id.fragment_container, new TotalExpenseFragment())
-                    .addToBackStack(null) // Allows user to hit 'back' to return here
+                    .addToBackStack(null)
                     .commit();
         });
 
@@ -99,6 +98,7 @@ public class BudgetFragment extends Fragment {
         });
     }
 
+    // --- RULE 3: BUDGET SCREEN FILTERS BY MONTH OR DAY ---
     private void calculateAndDisplayData() {
         if (allTransactions == null || allCategories == null) return;
 
@@ -106,14 +106,25 @@ public class BudgetFragment extends Fragment {
         double totalExpense = 0;
         double[] categorySpends = new double[allCategories.size()];
 
+        Calendar currentMonthCal = Calendar.getInstance();
+
         for (Transaction t : allTransactions) {
             Calendar txCal = Calendar.getInstance();
             txCal.setTimeInMillis(t.getDateTimestamp());
 
-            // Filter by the selected sliding calendar date
-            if (txCal.get(Calendar.DAY_OF_YEAR) != selectedDate.get(Calendar.DAY_OF_YEAR) ||
-                    txCal.get(Calendar.YEAR) != selectedDate.get(Calendar.YEAR)) {
-                continue;
+            // Apply Date Filter
+            if (selectedDate != null) {
+                // If user selected a specific day on the sliding calendar
+                if (txCal.get(Calendar.DAY_OF_YEAR) != selectedDate.get(Calendar.DAY_OF_YEAR) ||
+                        txCal.get(Calendar.YEAR) != selectedDate.get(Calendar.YEAR)) {
+                    continue;
+                }
+            } else {
+                // Default view: Show the entire CURRENT MONTH
+                if (txCal.get(Calendar.MONTH) != currentMonthCal.get(Calendar.MONTH) ||
+                        txCal.get(Calendar.YEAR) != currentMonthCal.get(Calendar.YEAR)) {
+                    continue;
+                }
             }
 
             if (t.getAmount() > 0) {
@@ -131,10 +142,11 @@ public class BudgetFragment extends Fragment {
             }
         }
 
+        // Update Top Cards
         textIncome.setText(String.format(Locale.getDefault(), "ETB %,.2f", totalIncome));
         textExpense.setText(String.format(Locale.getDefault(), "ETB %,.2f", totalExpense));
 
-        // Pass calculated data to Category Adapter
+        // Pass calculated data to Category Adapter to draw the progress bars!
         categoryAdapter.setData(allCategories, categorySpends);
     }
 
@@ -149,7 +161,7 @@ public class BudgetFragment extends Fragment {
             holder.textDayName.setText(new SimpleDateFormat("E", Locale.getDefault()).format(day.getTime()).substring(0, 1));
             holder.textDayNumber.setText(String.valueOf(day.get(Calendar.DAY_OF_MONTH)));
 
-            boolean isSelected = (day.get(Calendar.DAY_OF_YEAR) == selectedDate.get(Calendar.DAY_OF_YEAR));
+            boolean isSelected = (selectedDate != null && day.get(Calendar.DAY_OF_YEAR) == selectedDate.get(Calendar.DAY_OF_YEAR));
 
             if (isSelected) {
                 holder.cardDay.setCardBackgroundColor(android.graphics.Color.parseColor("#FF6D00"));
@@ -162,8 +174,12 @@ public class BudgetFragment extends Fragment {
             }
 
             holder.itemView.setOnClickListener(v -> {
-                selectedDate = day;
-                textMonthYear.setText(new SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(selectedDate.getTime()));
+                if (isSelected) {
+                    selectedDate = null; // Un-click to show full month
+                } else {
+                    selectedDate = day; // Select specific day
+                }
+                textMonthYear.setText(new SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(selectedDate == null ? Calendar.getInstance().getTime() : selectedDate.getTime()));
                 notifyDataSetChanged();
                 calculateAndDisplayData(); // Recalculate!
             });
@@ -188,7 +204,6 @@ public class BudgetFragment extends Fragment {
         public void setData(List<Category> cats, double[] sp) {
             this.categories = new ArrayList<>();
             List<Double> validSpends = new ArrayList<>();
-            // Only show Expenses!
             for (int i = 0; i < cats.size(); i++) {
                 if (!cats.get(i).getType().equalsIgnoreCase("Income")) {
                     this.categories.add(cats.get(i));
@@ -207,14 +222,16 @@ public class BudgetFragment extends Fragment {
         @Override public void onBindViewHolder(@NonNull CatViewHolder holder, int position) {
             Category cat = categories.get(position);
             double spent = spends[position];
-            double limit = 5000.0; // Dynamic later
+
+            // --- THE MAGIC: NO MORE HARDCODED 5000! ---
+            double limit = cat.getBudgetLimit();
+            if (limit <= 0) limit = 1; // Prevent divide by zero errors!
 
             holder.textCategoryName.setText(cat.getName());
             holder.textSpend.setText(String.format(Locale.getDefault(), "ETB %,.0f", spent));
-            holder.textLimit.setText(String.format(Locale.getDefault(), "ETB %,.0f", limit));
+            holder.textLimit.setText(String.format(Locale.getDefault(), "ETB %,.0f", cat.getBudgetLimit()));
 
-            // Dynamic Date!
-            holder.textCategoryDate.setText(new SimpleDateFormat("MMMM, yyyy", Locale.getDefault()).format(selectedDate.getTime()));
+            holder.textCategoryDate.setText(new SimpleDateFormat("MMMM, yyyy", Locale.getDefault()).format(selectedDate == null ? Calendar.getInstance().getTime() : selectedDate.getTime()));
 
             holder.progress.setMax((int) limit);
             holder.progress.setProgressCompat((int) spent, true);
@@ -233,6 +250,19 @@ public class BudgetFragment extends Fragment {
                 holder.textPercentage.setTextColor(android.graphics.Color.parseColor("#7C4DFF"));
                 holder.progress.setIndicatorColor(android.graphics.Color.parseColor("#7C4DFF"));
             }
+
+            // --- LONG PRESS TO DELETE CATEGORY ---
+            holder.itemView.setOnLongClickListener(v -> {
+                new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Delete Category?")
+                        .setMessage("Remove '" + cat.getName() + "'? Transactions using this category will remain, but will be marked as 'General'.")
+                        .setNegativeButton("Cancel", null)
+                        .setPositiveButton("Delete", (dialog, which) -> {
+                            viewModel.deleteCategory(cat);
+                            android.widget.Toast.makeText(getContext(), cat.getName() + " deleted", android.widget.Toast.LENGTH_SHORT).show();
+                        }).show();
+                return true;
+            });
         }
         @Override public int getItemCount() { return categories.size(); }
         class CatViewHolder extends RecyclerView.ViewHolder {

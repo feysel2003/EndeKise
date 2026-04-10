@@ -13,14 +13,16 @@ public class Category {
     private String type; // "Income" or "Expense"
     private String colorHex;
     private String iconName;
+    private double budgetLimit; // --- NEW FIELD! ---
 
     // Constructor
-    public Category(Integer parentCategoryId, String name, String type, String colorHex, String iconName) {
+    public Category(Integer parentCategoryId, String name, String type, String colorHex, String iconName, double budgetLimit) {
         this.parentCategoryId = parentCategoryId;
         this.name = name;
         this.type = type;
         this.colorHex = colorHex;
         this.iconName = iconName;
+        this.budgetLimit = budgetLimit;
     }
 
     // Getters and Setters
@@ -41,4 +43,6 @@ public class Category {
 
     public String getIconName() { return iconName; }
     public void setIconName(String iconName) { this.iconName = iconName; }
+    public double getBudgetLimit() { return budgetLimit; }
+    public void setBudgetLimit(double budgetLimit) { this.budgetLimit = budgetLimit; }
 }

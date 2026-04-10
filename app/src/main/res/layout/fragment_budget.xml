@@ -107,51 +107,32 @@
             <!-- PURPLE INCOME CARD -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
-                android:layout_height="140dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginEnd="8dp"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
                 app:cardBackgroundColor="#7C4DFF">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="16dp">
-
-                    <TextView android:id="@+id/labelIncome" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Salary" android:textColor="#E8EAF6"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="⋮" android:textColor="#FFFFFF" android:textStyle="bold" android:textSize="18sp"/>
-                    <TextView android:id="@+id/textBudgetIncome" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/labelIncome" android:text="ETB 0" android:textColor="#FFFFFF" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
-
-                    <ImageView android:id="@+id/iconCard1" android:layout_width="20dp" android:layout_height="20dp" android:layout_alignParentBottom="true" android:src="@android:drawable/ic_menu_agenda" app:tint="#FFFFFF" android:alpha="0.8"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toEndOf="@id/iconCard1" android:layout_alignParentBottom="true" android:layout_marginStart="8dp" android:text="Bank Account\n**** 1965" android:textColor="#FFFFFF" android:textSize="10sp" android:alpha="0.8"/>
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="16dp">
+                    <TextView android:id="@+id/labelIncome" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Income" android:textColor="#E8EAF6"/>
+                    <TextView android:id="@+id/textBudgetIncome" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/labelIncome" android:text="ETB 0" android:textColor="#FFFFFF" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="8dp" android:layout_marginBottom="8dp"/>
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- ORANGE EXPENSE CARD -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
-                android:layout_height="140dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
                 app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
                 app:cardBackgroundColor="#FF6D00">
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:padding="16dp">
-
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="16dp">
                     <TextView android:id="@+id/labelExpense" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Expense" android:textColor="#FFF3E0"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="⋮" android:textColor="#FFFFFF" android:textStyle="bold" android:textSize="18sp"/>
-                    <TextView android:id="@+id/textBudgetExpense" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/labelExpense" android:text="ETB 0" android:textColor="#FFFFFF" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="4dp"/>
-
-                    <ImageView android:id="@+id/iconCard2" android:layout_width="20dp" android:layout_height="20dp" android:layout_alignParentBottom="true" android:src="@android:drawable/ic_menu_agenda" app:tint="#FFFFFF" android:alpha="0.8"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_toEndOf="@id/iconCard2" android:layout_alignParentBottom="true" android:layout_marginStart="8dp" android:text="Bank Account\n**** 1965" android:textColor="#FFFFFF" android:textSize="10sp" android:alpha="0.8"/>
+                    <TextView android:id="@+id/textBudgetExpense" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/labelExpense" android:text="ETB 0" android:textColor="#FFFFFF" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="8dp" android:layout_marginBottom="8dp"/>
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
-        </LinearLayout>
+
+        </LinearLayout> <!-- THIS WAS THE MISSING CLOSING TAG! -->
 
         <!-- 4. EXPENSES CATEGORY HEADER -->
         <RelativeLayout
@@ -172,7 +153,9 @@
                 android:layout_alignParentEnd="true"
                 android:text="View All"
                 android:textSize="14sp"
-                android:textColor="#9E9E9E"/>
+                android:textColor="#9E9E9E"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"/>
         </RelativeLayout>
 
         <!-- 5. THE MODERN CATEGORY LIST -->

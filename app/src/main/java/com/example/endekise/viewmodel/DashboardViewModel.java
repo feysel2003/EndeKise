@@ -56,4 +56,7 @@ public class DashboardViewModel extends AndroidViewModel {
     public void deleteAccount(Account account) {
         repository.deleteAccount(account);
     }
+    public void deleteCategory(com.example.endekise.entity.Category category) {
+        repository.deleteCategory(category); // The ViewModel just tells the Repo to do it!
+    }
 }

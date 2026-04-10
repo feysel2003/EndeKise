@@ -16,4 +16,9 @@ public interface CategoryDao {
     // Get all categories so we can show them in the dropdown
     @Query("SELECT * FROM categories")
     LiveData<List<Category>> getAllCategories();
+
+    @androidx.room.Delete
+    void deleteCategory(com.example.endekise.entity.Category category);
+    @androidx.room.Update
+    void updateCategory(com.example.endekise.entity.Category category);
 }

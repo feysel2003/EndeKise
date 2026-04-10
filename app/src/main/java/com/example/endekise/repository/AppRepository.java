@@ -83,4 +83,7 @@ public class AppRepository {
     public void deleteAccount(Account account) {
         executorService.execute(() -> accountDao.deleteAccount(account));
     }
+    public void deleteCategory(com.example.endekise.entity.Category category) {
+        executorService.execute(() -> categoryDao.deleteCategory(category));
+    }
 }
