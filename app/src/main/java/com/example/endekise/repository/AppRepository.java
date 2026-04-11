@@ -86,4 +86,8 @@ public class AppRepository {
     public void deleteCategory(com.example.endekise.entity.Category category) {
         executorService.execute(() -> categoryDao.deleteCategory(category));
     }
+
+    public void updateCategory(com.example.endekise.entity.Category category) {
+        executorService.execute(() -> categoryDao.updateCategory(category));
+    }
 }

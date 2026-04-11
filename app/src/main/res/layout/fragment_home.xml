@@ -21,12 +21,64 @@
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="16dp">
-            <com.google.android.material.card.MaterialCardView android:id="@+id/imgProfile" android:layout_width="40dp" android:layout_height="40dp" app:cardCornerRadius="20dp" app:cardElevation="0dp" app:cardBackgroundColor="#9575CD">
-                <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_gravity="center" android:src="@android:drawable/ic_menu_myplaces" app:tint="#FFFFFF"/>
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/imgProfile"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#9575CD">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:scaleType="centerCrop"
+                    android:src="@android:drawable/ic_menu_myplaces"
+                    app:tint="#FFFFFF"/>
             </com.google.android.material.card.MaterialCardView>
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true" android:text="Home" android:textColor="#212121" android:textSize="18sp" android:textStyle="bold" />
-            <ImageView android:id="@+id/btnNotifications" android:layout_width="28dp" android:layout_height="28dp" android:layout_alignParentEnd="true" android:layout_centerVertical="true" android:src="@android:drawable/ic_popup_reminder" app:tint="#757575" />
-            <View android:layout_width="8dp" android:layout_height="8dp" android:layout_alignParentEnd="true" android:layout_marginTop="4dp" android:layout_marginEnd="4dp" android:background="@drawable/ic_launcher_background" android:backgroundTint="#FF3D00"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Home" android:textColor="#212121"
+                android:textSize="18sp" android:textStyle="bold" />
+            <!-- Premium Notification Bell Container -->
+            <RelativeLayout
+                android:id="@+id/btnNotifications"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless">
+
+                <!-- The Bell Icon -->
+                <ImageView
+                    android:id="@+id/iconBell"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_centerInParent="true"
+                    android:src="@android:drawable/ic_popup_reminder"
+                    app:tint="#757575" />
+
+                <!-- The Premium Red Dot (With White Stroke!) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/notificationDot"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="4dp"
+                    app:cardBackgroundColor="#FF3D00"
+                    app:cardCornerRadius="7dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#FFFFFF"
+                    app:strokeWidth="2dp"
+                    android:visibility="gone"/>
+            </RelativeLayout>
         </RelativeLayout>
 
         <!-- 2. THE NEW UNIFIED WEALTH CARD (With Gradient!) -->
@@ -46,8 +98,25 @@
                 android:background="@drawable/bg_wealth_card">
 
                 <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-                    <TextView android:id="@+id/labelTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Balance ˅" android:textColor="#E8EAF6" android:textSize="14sp" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="•••" android:textColor="#FFFFFF" android:textSize="20sp" android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/labelTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total Balance ˅"
+                        android:textColor="#E8EAF6"
+                        android:textSize="14sp" />
+                    <ImageView
+                        android:id="@+id/btnToggleVisibility"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:src="@android:drawable/ic_menu_view"
+                        app:tint="#FFFFFF" />
+
                 </RelativeLayout>
 
                 <TextView
@@ -180,22 +249,37 @@
                     android:orientation="horizontal"
                     android:weightSum="2">
 
-                    <!-- Income Legend (Purple) -->
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="Income"
-                        android:textColor="#212121"
-                        android:textSize="14sp"
-                        android:textStyle="bold"/>
-
-                    <!-- Expenses Legend (Orange) -->
+                    <!-- CLICKABLE Income Legend -->
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/btnLegendIncome"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:cardBackgroundColor="#F8F9FA"> <!-- Transparent by default -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="Income"
+                            android:textColor="#212121"
+                            android:textSize="14sp"
+                            android:textStyle="bold"/>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- CLICKABLE Expenses Legend -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/btnLegendExpense"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
                         app:cardCornerRadius="12dp"
                         app:cardElevation="2dp"
                         app:cardBackgroundColor="#FF6D00">

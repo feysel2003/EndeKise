@@ -59,4 +59,8 @@ public class DashboardViewModel extends AndroidViewModel {
     public void deleteCategory(com.example.endekise.entity.Category category) {
         repository.deleteCategory(category); // The ViewModel just tells the Repo to do it!
     }
+
+    public void updateCategory(com.example.endekise.entity.Category category) {
+        repository.updateCategory(category);
+    }
 }

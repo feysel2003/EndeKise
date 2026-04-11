@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="24dp"
+    android:paddingBottom="48dp"
+    android:background="@android:color/white"
+    android:gravity="center_horizontal">
+
+    <!-- The Drag Handle (Little gray pill at the top) -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/ic_launcher_background"
+        android:backgroundTint="#E0E0E0" />
+
+    <!-- Massive Avatar -->
+    <!-- Massive Avatar -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardAvatarContainer"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:clickable="true"
+        android:foreground="?attr/selectableItemBackground"
+        app:cardCornerRadius="50dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="#9575CD">
+
+        <ImageView
+            android:id="@+id/imgUserAvatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@android:drawable/ic_menu_myplaces"
+            app:tint="#FFFFFF"/>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Add a little "Tap to change" hint -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tap to change photo"
+        android:textColor="#9E9E9E"
+        android:textSize="12sp"
+        android:layout_marginTop="8dp"/>
+
+    <!-- User Details -->
+    <TextView
+        android:id="@+id/textUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Guest User"
+        android:textColor="#212121"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textUserEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Track your expenses securely"
+        android:textColor="#757575"
+        android:textSize="14sp" />
+
+    <!-- Mini Stats Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="32dp"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+            <TextView android:id="@+id/textTotalLogs" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#7C4DFF" android:textSize="20sp" android:textStyle="bold"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Transactions" android:textColor="#9E9E9E" android:textSize="12sp"/>
+        </LinearLayout>
+
+        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="#F0F0F0"/>
+
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:gravity="center">
+            <TextView android:id="@+id/textActiveWallets" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#FF6D00" android:textSize="20sp" android:textStyle="bold"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Active Wallets" android:textColor="#9E9E9E" android:textSize="12sp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="32dp" android:layout_marginBottom="16dp" android:background="#F5F5F5"/>
+
+    <!-- Action Menu -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp">
+
+        <RelativeLayout
+            android:id="@+id/btnEditProfile"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:paddingHorizontal="16dp">
+            <ImageView android:id="@+id/iconEdit" android:layout_width="24dp" android:layout_height="24dp" android:layout_centerVertical="true" android:src="@android:drawable/ic_menu_edit" app:tint="#212121" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_marginStart="16dp" android:layout_toEndOf="@id/iconEdit" android:text="Edit Profile Name" android:textColor="#212121" android:textSize="16sp" android:textStyle="bold"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/btnResetData"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:paddingHorizontal="16dp">
+            <ImageView android:id="@+id/iconReset" android:layout_width="24dp" android:layout_height="24dp" android:layout_centerVertical="true" android:src="@android:drawable/ic_menu_delete" app:tint="#D32F2F" />
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_marginStart="16dp" android:layout_toEndOf="@id/iconReset" android:text="Reset All Data" android:textColor="#D32F2F" android:textSize="16sp" android:textStyle="bold"/>
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

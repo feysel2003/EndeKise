@@ -41,7 +41,20 @@ public class WalletsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         viewModel = new ViewModelProvider(requireActivity()).get(DashboardViewModel.class);
+// --- PROFILE PICTURE LOGIC ---
+        View profileContainer = view.findViewById(R.id.imgProfile);
+        if (profileContainer instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) profileContainer;
+            if (group.getChildCount() > 0 && group.getChildAt(0) instanceof android.widget.ImageView) {
+                android.widget.ImageView iconProfile = (android.widget.ImageView) group.getChildAt(0);
+                com.example.endekise.utils.ImageUtils.loadProfileImage(requireContext(), iconProfile);
+            }
+        }
 
+        profileContainer.setOnClickListener(v -> {
+            ProfileBottomSheet profileSheet = new ProfileBottomSheet();
+            profileSheet.show(getParentFragmentManager(), "ProfileBottomSheet");
+        });
         // 1. SETUP GRID RECYCLER VIEW
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewWalletsGrid);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2)); // 2 columns

@@ -19,22 +19,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
-            android:layout_marginTop="8dp">
-
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp">
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/imgProfile"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:clickable="true"
+                android:focusable="true"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
                 app:cardBackgroundColor="#9575CD">
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center"
+                    android:scaleType="centerCrop"
                     android:src="@android:drawable/ic_menu_myplaces"
                     app:tint="#FFFFFF"/>
             </com.google.android.material.card.MaterialCardView>
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -43,23 +46,41 @@
                 android:textColor="#212121"
                 android:textSize="18sp"
                 android:textStyle="bold" />
-
-            <ImageView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+            <!-- Premium Notification Bell Container -->
+            <RelativeLayout
+                android:id="@+id/btnNotifications"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:src="@android:drawable/ic_popup_reminder"
-                app:tint="#757575" />
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless">
 
-            <View
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:layout_alignParentEnd="true"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="4dp"
-                android:background="@drawable/ic_launcher_background"
-                android:backgroundTint="#FF3D00"/>
+                <!-- The Bell Icon -->
+                <ImageView
+                    android:id="@+id/iconBell"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_centerInParent="true"
+                    android:src="@android:drawable/ic_popup_reminder"
+                    app:tint="#757575" />
+
+                <!-- The Premium Red Dot (With White Stroke!) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/notificationDot"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="4dp"
+                    app:cardBackgroundColor="#FF3D00"
+                    app:cardCornerRadius="7dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#FFFFFF"
+                    app:strokeWidth="2dp"
+                    android:visibility="gone"/>
+            </RelativeLayout>
         </RelativeLayout>
 
         <!-- 2. THE HORIZONTAL CALENDAR STRIP -->
@@ -135,6 +156,7 @@
         </LinearLayout> <!-- THIS WAS THE MISSING CLOSING TAG! -->
 
         <!-- 4. EXPENSES CATEGORY HEADER -->
+        <!-- 4. EXPENSES CATEGORY HEADER -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -143,14 +165,38 @@
             android:layout_marginTop="32dp"
             android:layout_marginBottom="12dp">
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Expenses" android:textSize="18sp" android:textStyle="bold" android:textColor="@android:color/black"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Expenses" android:textSize="18sp" android:textStyle="bold" android:textColor="@android:color/black" android:layout_centerVertical="true"/>
 
-            <!-- VIEW ALL BUTTON (Java will click this!) -->
+            <!-- The Add Category Button -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnAddCategory"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_toStartOf="@id/btnViewAll"
+                android:layout_marginEnd="16dp"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="8dp"
+                app:cardBackgroundColor="#E8EAF6"
+                app:cardElevation="0dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:paddingHorizontal="16dp"
+                    android:text="+ ADD"
+                    android:textColor="#7C4DFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"/>
+            </com.google.android.material.card.MaterialCardView>
+
             <TextView
                 android:id="@+id/btnViewAll"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
                 android:text="View All"
                 android:textSize="14sp"
                 android:textColor="#9E9E9E"
