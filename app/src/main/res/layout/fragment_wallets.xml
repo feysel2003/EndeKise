@@ -84,27 +84,28 @@
         </RelativeLayout>
 
         <!-- 2. TOTAL WEALTH SUMMARY CARD -->
+        <!-- 2. TOTAL WEALTH SUMMARY CARD (Now consistent with Home Screen!) -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="24dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
-            app:cardBackgroundColor="#1A1A2E"> <!-- Deep Dark Blue -->
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="24dp"
-                android:gravity="center">
+                android:gravity="center"
+                android:background="@drawable/bg_wealth_card"> <!-- APPLIES THE PREMIUM GRADIENT! -->
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Total Available Balance"
-                    android:textColor="#A0A0B0"
+                    android:textColor="#E8EAF6"
                     android:textSize="14sp" />
 
                 <TextView
@@ -118,7 +119,6 @@
                     android:layout_marginTop="8dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-
         <!-- 3. WALLETS HEADER WITH ADD BUTTON -->
         <RelativeLayout
             android:layout_width="match_parent"
@@ -162,13 +162,14 @@
         </RelativeLayout>
 
         <!-- 4. THE GRID OF WALLETS -->
+        <!-- 4. THE VERTICAL LIST OF WALLETS -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewWalletsGrid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="12dp"
+            android:layout_marginTop="8dp"
+            android:paddingBottom="100dp"
             android:clipToPadding="false"
             android:nestedScrollingEnabled="false"/>
-
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

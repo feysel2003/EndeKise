@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.endekise.R;
@@ -57,8 +58,7 @@ public class WalletsFragment extends Fragment {
         });
         // 1. SETUP GRID RECYCLER VIEW
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewWalletsGrid);
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2)); // 2 columns
-        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext())); // Vertical List!        recyclerView.setHasFixedSize(true);
 
         WalletAdapter adapter = new WalletAdapter();
         recyclerView.setAdapter(adapter);

@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
+    android:background="#F4F5F7"
     android:clipToPadding="false"
     android:paddingBottom="100dp">
 
@@ -12,144 +12,192 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="24dp">
+        android:paddingTop="16dp">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="16dp"
             android:text="Settings"
             android:textAlignment="center"
             android:textColor="#212121"
-            android:textSize="24sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- 1. PROFILE / ACCOUNT SECTION -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnEditProfile"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:text="General"
-            android:textColor="#757575"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="24dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#FFFFFF">
 
-        <!-- GENERAL SETTINGS CARD -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardAvatar"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_centerVertical="true"
+                    app:cardCornerRadius="30dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#9575CD">
+                    <ImageView
+                        android:id="@+id/imgSettingsProfile"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@android:drawable/ic_menu_myplaces"
+                        app:tint="#FFFFFF"/>
+                </com.google.android.material.card.MaterialCardView>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/cardAvatar"
+                    android:layout_marginStart="16dp"
+                    android:layout_centerVertical="true"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textSettingsName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mifta Feysel"
+                        android:textColor="#212121"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tap to edit profile"
+                        android:textColor="#7C4DFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="4dp"/>
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:src="@android:drawable/ic_menu_edit"
+                    app:tint="#BDBDBD" />
+            </RelativeLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 2. SECURITY & APPEARANCE -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="24dp" android:layout_marginBottom="8dp" android:text="Security &amp; Appearance" android:textColor="#757575" android:textSize="12sp" android:textStyle="bold" />
+
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="20dp"
             android:layout_marginBottom="24dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="#E0E0E0"
             app:cardBackgroundColor="#FFFFFF">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                <!-- App PIN Toggle -->
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="60dp" android:paddingHorizontal="16dp">
+                    <ImageView android:id="@+id/iconPin" android:layout_width="24dp" android:layout_height="24dp" android:layout_centerVertical="true" android:src="@android:drawable/ic_secure" app:tint="#00C853" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_marginStart="16dp" android:layout_toEndOf="@id/iconPin" android:text="Require PIN on Launch" android:textColor="#212121" android:textSize="16sp" />
+                    <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/switchPinLock" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true" />
+                </RelativeLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" android:layout_marginStart="56dp"/>
 
                 <!-- Dark Mode Toggle -->
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:clickable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:paddingHorizontal="16dp">
-
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="60dp" android:paddingHorizontal="16dp">
                     <ImageView android:id="@+id/iconDark" android:layout_width="24dp" android:layout_height="24dp" android:layout_centerVertical="true" android:src="@android:drawable/ic_menu_gallery" app:tint="#7C4DFF" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_marginStart="16dp" android:layout_toEndOf="@id/iconDark" android:text="Dark Mode" android:textColor="#212121" android:textSize="16sp" />
                     <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/switchDarkMode" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true" />
                 </RelativeLayout>
-
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F5F5F5" android:layout_marginStart="56dp"/>
-
-                <!-- Currency Selection -->
-                <RelativeLayout
-                    android:id="@+id/btnCurrency"
-                    android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:clickable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:paddingHorizontal="16dp">
-
-                    <ImageView android:id="@+id/iconCurrency" android:layout_width="24dp" android:layout_height="24dp" android:layout_centerVertical="true" android:src="@android:drawable/ic_menu_sort_by_size" app:tint="#7C4DFF" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_marginStart="16dp" android:layout_toEndOf="@id/iconCurrency" android:text="Base Currency" android:textColor="#212121" android:textSize="16sp" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true" android:text="ETB" android:textColor="#9E9E9E" android:textSize="16sp" />
-                </RelativeLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- 3. DATA & BACKUP -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="24dp" android:layout_marginBottom="8dp" android:text="Data &amp; Backup" android:textColor="#757575" android:textSize="12sp" android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:text="Security &amp; Data"
-            android:textColor="#757575"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-
-        <!-- SECURITY SETTINGS CARD -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="20dp"
             android:layout_marginBottom="24dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="#E0E0E0"
             app:cardBackgroundColor="#FFFFFF">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <!-- Biometric App Lock Toggle -->
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:clickable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:paddingHorizontal="16dp">
-
-                    <ImageView android:id="@+id/iconLock" android:layout_width="24dp" android:layout_height="24dp" android:layout_centerVertical="true" android:src="@android:drawable/ic_secure" app:tint="#00C853" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_marginStart="16dp" android:layout_toEndOf="@id/iconLock" android:text="Require Fingerprint" android:textColor="#212121" android:textSize="16sp" />
-                    <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/switchBiometric" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true" />
+                <!-- Cloud Sync (Mock) -->
+                <RelativeLayout android:id="@+id/btnCloudSync" android:layout_width="match_parent" android:layout_height="60dp" android:clickable="true" android:foreground="?attr/selectableItemBackground" android:paddingHorizontal="16dp">
+                    <ImageView android:id="@+id/iconCloud" android:layout_width="24dp" android:layout_height="24dp" android:layout_centerVertical="true" android:src="@android:drawable/ic_menu_upload" app:tint="#0277BD" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_marginStart="16dp" android:layout_toEndOf="@id/iconCloud" android:text="Cloud Sync (Firebase)" android:textColor="#212121" android:textSize="16sp" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true" android:text="Pro" android:textColor="#FF6D00" android:textSize="12sp" android:textStyle="bold"/>
                 </RelativeLayout>
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F5F5F5" android:layout_marginStart="56dp"/>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" android:layout_marginStart="56dp"/>
 
-                <!-- Database Backup Button -->
-                <RelativeLayout
-                    android:id="@+id/btnBackup"
-                    android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:clickable="true"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:paddingHorizontal="16dp">
-
-                    <ImageView android:id="@+id/iconBackup" android:layout_width="24dp" android:layout_height="24dp" android:layout_centerVertical="true" android:src="@android:drawable/ic_menu_save" app:tint="#FF6D00" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginStart="16dp"
-                        android:layout_toEndOf="@id/iconBackup"
-                        android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Export Backup" android:textColor="#212121" android:textSize="16sp" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Save database to local storage" android:textColor="#9E9E9E" android:textSize="12sp" />
-                    </LinearLayout>
+                <!-- Export CSV -->
+                <RelativeLayout android:id="@+id/btnExportCSV" android:layout_width="match_parent" android:layout_height="60dp" android:clickable="true" android:foreground="?attr/selectableItemBackground" android:paddingHorizontal="16dp">
+                    <ImageView android:id="@+id/iconCsv" android:layout_width="24dp" android:layout_height="24dp" android:layout_centerVertical="true" android:src="@android:drawable/ic_menu_save" app:tint="#212121" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_marginStart="16dp" android:layout_toEndOf="@id/iconCsv" android:text="Export Data (CSV)" android:textColor="#212121" android:textSize="16sp" />
                 </RelativeLayout>
-
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <!-- 4. FEEDBACK & ACCOUNT -->
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="24dp" android:layout_marginBottom="8dp" android:text="Feedback &amp; Account" android:textColor="#757575" android:textSize="12sp" android:textStyle="bold" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#FFFFFF">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+
+                <!-- Contact Us -->
+                <RelativeLayout android:id="@+id/btnContactUs" android:layout_width="match_parent" android:layout_height="60dp" android:clickable="true" android:foreground="?attr/selectableItemBackground" android:paddingHorizontal="16dp">
+                    <ImageView android:id="@+id/iconContact" android:layout_width="24dp" android:layout_height="24dp" android:layout_centerVertical="true" android:src="@android:drawable/ic_dialog_email" app:tint="#FF6D00" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_marginStart="16dp" android:layout_toEndOf="@id/iconContact" android:text="Contact Us" android:textColor="#212121" android:textSize="16sp" />
+                </RelativeLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" android:layout_marginStart="56dp"/>
+
+                <!-- Privacy Policy -->
+                <RelativeLayout android:id="@+id/btnPrivacy" android:layout_width="match_parent" android:layout_height="60dp" android:clickable="true" android:foreground="?attr/selectableItemBackground" android:paddingHorizontal="16dp">
+                    <ImageView android:id="@+id/iconPrivacy" android:layout_width="24dp" android:layout_height="24dp" android:layout_centerVertical="true" android:src="@android:drawable/ic_dialog_info" app:tint="#212121" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_marginStart="16dp" android:layout_toEndOf="@id/iconPrivacy" android:text="Privacy Policy" android:textColor="#212121" android:textSize="16sp" />
+                </RelativeLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 5. LOGOUT BUTTON -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogout"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginHorizontal="20dp"
+            android:text="LOGOUT"
+            android:textColor="#D32F2F"
+            app:strokeColor="#D32F2F"
+            app:cornerRadius="12dp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

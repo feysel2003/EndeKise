@@ -52,32 +52,57 @@ public class WalletAdapter extends RecyclerView.Adapter<WalletAdapter.WalletView
         holder.textWalletType.setText(currentWallet.getType());
         holder.textWalletBalance.setText(String.format(Locale.getDefault(), "ETB %,.2f", currentWallet.getCurrentBalance()));
 
-        // ETHIOPIAN LOCALIZED COLOR BRANDING
+        // --- ETHIOPIAN LOCALIZED GRADIENT BRANDING ---
         String nameLower = walletName.toLowerCase();
+        int colorStart;
+        int colorEnd;
+
         if (nameLower.contains("cbe") || nameLower.contains("commercial bank")) {
-            holder.cardView.setCardBackgroundColor(android.graphics.Color.parseColor("#4A148C"));
+            // CBE: Deep Purple to Magenta
+            colorStart = android.graphics.Color.parseColor("#4A148C");
+            colorEnd = android.graphics.Color.parseColor("#880E4F");
         } else if (nameLower.contains("telebirr")) {
-            holder.cardView.setCardBackgroundColor(android.graphics.Color.parseColor("#00BCD4"));
+            // Telebirr: Light Blue to Cyan
+            colorStart = android.graphics.Color.parseColor("#0277BD");
+            colorEnd = android.graphics.Color.parseColor("#00BCD4");
         } else if (nameLower.contains("awash")) {
-            holder.cardView.setCardBackgroundColor(android.graphics.Color.parseColor("#1565C0"));
+            // Awash Bank: Deep Blue to Light Blue
+            colorStart = android.graphics.Color.parseColor("#0D47A1");
+            colorEnd = android.graphics.Color.parseColor("#1976D2");
         } else if (nameLower.contains("dashen")) {
-            holder.cardView.setCardBackgroundColor(android.graphics.Color.parseColor("#F9A825"));
+            // Dashen: Deep Orange to Yellow
+            colorStart = android.graphics.Color.parseColor("#E65100");
+            colorEnd = android.graphics.Color.parseColor("#FBC02D");
         } else if (nameLower.contains("boa") || nameLower.contains("abyssinia")) {
-            holder.cardView.setCardBackgroundColor(android.graphics.Color.parseColor("#F57F17"));
+            // Bank of Abyssinia: Gold to Yellow
+            colorStart = android.graphics.Color.parseColor("#F57F17");
+            colorEnd = android.graphics.Color.parseColor("#FBC02D");
         } else if (currentWallet.getType().equalsIgnoreCase("Cash")) {
-            holder.cardView.setCardBackgroundColor(android.graphics.Color.parseColor("#2E7D32"));
-        } else if (currentWallet.getType().equalsIgnoreCase("Mobile Money")) {
-            holder.cardView.setCardBackgroundColor(android.graphics.Color.parseColor("#00897B"));
+            // Cash: Forest Green to Light Green
+            colorStart = android.graphics.Color.parseColor("#1B5E20");
+            colorEnd = android.graphics.Color.parseColor("#4CAF50");
         } else {
-            holder.cardView.setCardBackgroundColor(android.graphics.Color.parseColor("#2A2D43"));
+            // Default: Sleek Dark Slate to Gray
+            colorStart = android.graphics.Color.parseColor("#263238");
+            colorEnd = android.graphics.Color.parseColor("#455A64");
         }
 
-        // --- 2. NEW: Fire the Long Click Event ---
+        // Apply the beautiful dynamic gradient!
+        android.graphics.drawable.GradientDrawable gd = new android.graphics.drawable.GradientDrawable(
+                android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                new int[]{colorStart, colorEnd});
+        gd.setCornerRadius(60f); // Match the MaterialCardView corner radius (roughly 20dp)
+
+        // Remove the flat color and set the gradient background!
+        holder.cardView.setCardBackgroundColor(android.graphics.Color.TRANSPARENT);
+        holder.cardView.setBackground(gd);
+
+        // --- Handle Long Press to Delete ---
         holder.cardView.setOnLongClickListener(v -> {
             if (longClickListener != null) {
                 longClickListener.onWalletLongClick(currentWallet);
             }
-            return true; // Return true means we handled the long click!
+            return true;
         });
     }
 

@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.endekise.R;
 import com.example.endekise.entity.Account;
+import com.example.endekise.entity.Category;
 import com.example.endekise.entity.Transaction;
 import com.example.endekise.viewmodel.DashboardViewModel;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -25,13 +26,17 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class AddTransactionBottomSheet extends BottomSheetDialogFragment {
 
     private DashboardViewModel viewModel;
     private List<Account> accountList = new ArrayList<>();
+    private List<Category> allCategoriesList = new ArrayList<>(); // Store ALL categories from DB
+
     private int selectedFromAccountId = -1;
-    private int selectedToAccountId = -1; // For transfers
+    private int selectedToAccountId = -1;
+    private MaterialAutoCompleteTextView dropdownCategory; // We need this to update it dynamically
 
     @Nullable
     @Override
@@ -57,30 +62,35 @@ public class AddTransactionBottomSheet extends BottomSheetDialogFragment {
         MaterialAutoCompleteTextView dropdownWalletTo = view.findViewById(R.id.dropdownWalletTo);
 
         // Category Dropdowns
-        MaterialAutoCompleteTextView dropdownCategory = view.findViewById(R.id.dropdownCategory);
+        dropdownCategory = view.findViewById(R.id.dropdownCategory);
         TextInputLayout layoutCategory = view.findViewById(R.id.layoutCategory);
 
-        // --- DYNAMIC UI: Show/Hide Wallets and Categories based on Toggle ---
+        // --- 1. DYNAMIC UI: Show/Hide Wallets and Categories based on Toggle ---
         toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (isChecked) {
                 if (checkedId == R.id.buttonTransfer) {
-                    layoutWalletTo.setVisibility(View.VISIBLE); // Show "To Wallet"
-                    layoutCategory.setVisibility(View.GONE);    // Hide Category
-                    editTextNote.setVisibility(View.GONE);      // Hide Note
+                    layoutWalletTo.setVisibility(View.VISIBLE);
+                    layoutCategory.setVisibility(View.GONE);
+                    editTextNote.setVisibility(View.GONE);
                 } else {
-                    layoutWalletTo.setVisibility(View.GONE);    // Hide "To Wallet"
-                    layoutCategory.setVisibility(View.VISIBLE); // Show Category
-                    editTextNote.setVisibility(View.VISIBLE);   // Show Note
+                    layoutWalletTo.setVisibility(View.GONE);
+                    layoutCategory.setVisibility(View.VISIBLE);
+                    editTextNote.setVisibility(View.VISIBLE);
+
+                    // --- SMART CATEGORY FILTERING ---
+                    // If they click Income or Expense, immediately refresh the dropdown list!
+                    updateCategoryDropdownBasedOnToggle(checkedId);
                 }
             }
         });
 
-        // --- FETCH WALLETS ---
+        // --- 2. FETCH WALLETS ---
         viewModel.getAllAccounts().observe(getViewLifecycleOwner(), accounts -> {
             accountList = accounts;
             List<String> accountNames = new ArrayList<>();
             for (Account acc : accounts) {
-                accountNames.add(acc.getName());
+                // Show the balance in the dropdown so the user knows what they have!
+                accountNames.add(acc.getName() + " (ETB " + String.format(Locale.getDefault(), "%,.0f", acc.getCurrentBalance()) + ")");
             }
 
             ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, accountNames);
@@ -88,7 +98,7 @@ public class AddTransactionBottomSheet extends BottomSheetDialogFragment {
             dropdownWalletTo.setAdapter(adapter);
 
             if (!accounts.isEmpty()) {
-                dropdownWallet.setText(accounts.get(0).getName(), false);
+                dropdownWallet.setText(accountNames.get(0), false);
                 selectedFromAccountId = accounts.get(0).getAccountId();
             }
         });
@@ -96,26 +106,18 @@ public class AddTransactionBottomSheet extends BottomSheetDialogFragment {
         dropdownWallet.setOnItemClickListener((parent, v, position, id) -> selectedFromAccountId = accountList.get(position).getAccountId());
         dropdownWalletTo.setOnItemClickListener((parent, v, position, id) -> selectedToAccountId = accountList.get(position).getAccountId());
 
-        // --- FETCH CATEGORIES ---
-        List<String> categoryNames = new ArrayList<>();
+        // --- 3. FETCH CATEGORIES (And store them!) ---
         viewModel.getAllCategories().observe(getViewLifecycleOwner(), categories -> {
-            categoryNames.clear();
-            for (com.example.endekise.entity.Category cat : categories) {
-                categoryNames.add(cat.getName());
-            }
-            ArrayAdapter<String> catAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, categoryNames);
-            dropdownCategory.setAdapter(catAdapter);
-
-            if (!categoryNames.isEmpty()) {
-                dropdownCategory.setText(categoryNames.get(0), false);
-            }
+            allCategoriesList = categories;
+            // Initially populate the dropdown based on the default selected toggle (Expense)
+            updateCategoryDropdownBasedOnToggle(toggleGroup.getCheckedButtonId());
         });
 
         // Auto-focus Keyboard
         editTextAmount.requestFocus();
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
-        // --- SAVE BUTTON LOGIC ---
+        // --- 4. THE SMART SAVE LOGIC ---
         buttonSave.setOnClickListener(v -> {
             String amountStr = editTextAmount.getText().toString().trim();
             if (amountStr.isEmpty()) {
@@ -131,26 +133,71 @@ public class AddTransactionBottomSheet extends BottomSheetDialogFragment {
                     Toast.makeText(getContext(), "Please select a different TO wallet", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                // OVERDRAFT PROTECTION FOR TRANSFERS
+                Account fromAccount = viewModel.getAccountById(selectedFromAccountId);
+                if (fromAccount != null && fromAccount.getCurrentBalance() < amount) {
+                    editTextAmount.setError("Insufficient funds in " + fromAccount.getName());
+                    Toast.makeText(getContext(), "Transfer failed: Wallet balance is only ETB " + fromAccount.getCurrentBalance(), Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 viewModel.executeTransfer(selectedFromAccountId, selectedToAccountId, amount);
                 Toast.makeText(getContext(), "Transfer complete!", Toast.LENGTH_SHORT).show();
                 dismiss();
                 return;
             }
 
-            // LOGIC 2: INCOME OR EXPENSE
+            // LOGIC 2: EXPENSE
             if (toggleGroup.getCheckedButtonId() == R.id.buttonExpense) {
-                amount = amount * -1; // Make it negative
+
+                // OVERDRAFT PROTECTION FOR EXPENSES
+                Account fromAccount = viewModel.getAccountById(selectedFromAccountId);
+                if (fromAccount != null && fromAccount.getCurrentBalance() < amount) {
+                    editTextAmount.setError("Insufficient funds");
+                    Toast.makeText(getContext(), "You only have ETB " + String.format(Locale.getDefault(), "%,.2f", fromAccount.getCurrentBalance()) + " in this wallet!", Toast.LENGTH_LONG).show();
+                    return; // BLOCK THE SAVE!
+                }
+
+                amount = amount * -1; // Make it negative for the database
             }
 
-            String note = editTextNote.getText().toString().trim();
-            String selectedCategory = dropdownCategory.getText().toString(); // Get selected category here!
+            // LOGIC 3: INCOME (No overdraft protection needed, you can always add money!)
 
-            // Create transaction using the selected category instead of "General"
+            String note = editTextNote.getText().toString().trim();
+            String selectedCategory = dropdownCategory.getText().toString();
+
+            // Create transaction
             Transaction newTransaction = new Transaction(selectedFromAccountId, amount, System.currentTimeMillis(), note, selectedCategory, 0.0, 0.0, true);
             viewModel.insertTransaction(newTransaction);
 
             Toast.makeText(getContext(), "Saved successfully!", Toast.LENGTH_SHORT).show();
             dismiss();
         });
+    }
+
+    // --- HELPER METHOD: Filter Categories based on the Toggle Button! ---
+    private void updateCategoryDropdownBasedOnToggle(int checkedToggleId) {
+        if (allCategoriesList == null || allCategoriesList.isEmpty()) return;
+
+        List<String> filteredNames = new ArrayList<>();
+        String targetType = (checkedToggleId == R.id.buttonExpense) ? "Expense" : "Income";
+
+        for (Category cat : allCategoriesList) {
+            // Only add the category to the dropdown if its Type matches the toggle!
+            if (cat.getType().equalsIgnoreCase(targetType)) {
+                filteredNames.add(cat.getName());
+            }
+        }
+
+        ArrayAdapter<String> catAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, filteredNames);
+        dropdownCategory.setAdapter(catAdapter);
+
+        // Auto-select the first valid category so the box isn't empty
+        if (!filteredNames.isEmpty()) {
+            dropdownCategory.setText(filteredNames.get(0), false);
+        } else {
+            dropdownCategory.setText("", false); // Clear it if no categories exist for that type
+        }
     }
 }

@@ -2,54 +2,85 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardWalletContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="#6200EE"> <!-- Default purple, will change dynamically -->
+    android:layout_marginHorizontal="20dp"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="#6200EE"> <!-- Default purple, Java changes this! -->
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="140dp"
-        android:padding="16dp">
+        android:layout_height="wrap_content"
+        android:padding="24dp">
 
-        <ImageView
-            android:id="@+id/iconWallet"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@android:drawable/ic_menu_agenda"
-            app:tint="#FFFFFF"
-            android:alpha="0.8"/>
+        <!-- Top Left: Bank Icon in a frosted glass circle -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/iconContainer"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#33FFFFFF"> <!-- 20% Opacity White (Frosted) -->
 
+            <ImageView
+                android:id="@+id/iconWallet"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_myplaces"
+                app:tint="#FFFFFF" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Top Right: Account Type (e.g., Mobile Money) -->
         <TextView
             android:id="@+id/textWalletType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:text="Bank"
+            android:background="@drawable/ic_custom_launcher_background"
+            android:backgroundTint="#33000000"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="4dp"
+            android:text="Mobile Money"
             android:textColor="#FFFFFF"
             android:textSize="12sp"
-            android:alpha="0.7"/>
+            android:textStyle="bold" />
 
+        <!-- Middle: Bank Name (e.g., Telebirr) -->
         <TextView
             android:id="@+id/textWalletName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/textWalletBalance"
-            android:text="CBE Bank"
-            android:textColor="#FFFFFF"
+            android:layout_below="@id/iconContainer"
+            android:layout_marginTop="24dp"
+            android:text="Telebirr"
+            android:textColor="#E0FFFFFF"
             android:textSize="16sp"
-            android:layout_marginBottom="4dp"/>
+            android:letterSpacing="0.1" />
 
+        <!-- Bottom: Balance -->
         <TextView
             android:id="@+id/textWalletBalance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:text="ETB 5,000.00"
+            android:layout_below="@id/textWalletName"
+            android:layout_marginTop="4dp"
+            android:text="ETB 15,000.00"
             android:textColor="#FFFFFF"
-            android:textSize="20sp"
+            android:textSize="28sp"
             android:textStyle="bold" />
+
+        <!-- Bottom Right: Fake Card Chip or Logo to make it look real -->
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignBottom="@id/textWalletBalance"
+            android:src="@android:drawable/ic_secure"
+            app:tint="#4DFFFFFF" /> <!-- 30% Opacity White -->
+
     </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>

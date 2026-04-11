@@ -63,4 +63,17 @@ public class DashboardViewModel extends AndroidViewModel {
     public void updateCategory(com.example.endekise.entity.Category category) {
         repository.updateCategory(category);
     }
+    // --- HELPER TO GET A SPECIFIC WALLET ---
+    public Account getAccountById(int accountId) {
+        // Find the account in the current LiveData list
+        List<Account> accounts = repository.getAllAccounts().getValue();
+        if (accounts != null) {
+            for (Account acc : accounts) {
+                if (acc.getAccountId() == accountId) {
+                    return acc;
+                }
+            }
+        }
+        return null;
+    }
 }

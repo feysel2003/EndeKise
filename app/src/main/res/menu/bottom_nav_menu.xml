@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item
         android:id="@+id/nav_home"
-        android:icon="@android:drawable/ic_menu_view"
+        android:icon="@drawable/ic_nav_home"
         android:title="Home" />
+
     <item
         android:id="@+id/nav_wallets"
-        android:icon="@android:drawable/ic_menu_gallery"
+        android:icon="@drawable/ic_nav_wallet"
         android:title="Wallets" />
 
-    <!-- This is a blank placeholder to make room for our Floating Orange Button -->
+    <!-- This blank item pushes the others to the side, making room for the Orange FAB! -->
     <item
         android:id="@+id/nav_placeholder"
         android:title=""
@@ -17,10 +19,12 @@
 
     <item
         android:id="@+id/nav_budget"
-        android:icon="@android:drawable/ic_menu_today"
+        android:icon="@drawable/ic_nav_budget"
         android:title="Budget" />
+
     <item
         android:id="@+id/nav_settings"
-        android:icon="@android:drawable/ic_menu_manage"
+        android:icon="@drawable/ic_nav_settings"
         android:title="Settings" />
+
 </menu>
