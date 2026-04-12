@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.endekise.R;
 import com.example.endekise.adapter.TransactionAdapter;
 import com.example.endekise.entity.Account;
+import com.example.endekise.entity.Category;
 import com.example.endekise.entity.Transaction;
 import com.example.endekise.viewmodel.DashboardViewModel;
 import com.github.mikephil.charting.charts.BarChart;
@@ -91,16 +92,25 @@ public class HomeFragment extends Fragment {
         // --- 3. PRIVACY MODE TOGGLE (THE EYE ICON) ---
         btnToggleVisibility.setOnClickListener(v -> {
             isBalanceHidden = !isBalanceHidden;
-            updateBalanceTexts(); // Refresh the text fields!
-
-            // Change icon slightly to indicate it's hidden (Using default search icon as a "hidden" look for now)
+            updateBalanceTexts();
             btnToggleVisibility.setImageResource(isBalanceHidden ? android.R.drawable.ic_menu_search : android.R.drawable.ic_menu_view);
         });
 
-        // --- 4. VIEW ALL TRANSACTIONS ---
+        // --- 4. FRAGMENT ROUTING (View All & Legends) ---
         view.findViewById(R.id.btnViewAll).setOnClickListener(v -> getParentFragmentManager().beginTransaction()
                 .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                 .replace(R.id.fragment_container, new AllTransactionsFragment())
+                .addToBackStack(null).commit());
+
+        // [RESTORED] Legend Clicks to open Details Screen!
+        view.findViewById(R.id.btnLegendIncome).setOnClickListener(v -> getParentFragmentManager().beginTransaction()
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                .replace(R.id.fragment_container, new TransactionDetailFragment(true, selectedYear, selectedMonth))
+                .addToBackStack(null).commit());
+
+        view.findViewById(R.id.btnLegendExpense).setOnClickListener(v -> getParentFragmentManager().beginTransaction()
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                .replace(R.id.fragment_container, new TransactionDetailFragment(false, selectedYear, selectedMonth))
                 .addToBackStack(null).commit());
 
         // --- 5. NOTIFICATION BELL ---
@@ -137,25 +147,7 @@ public class HomeFragment extends Fragment {
             popup.show();
         });
 
-        // --- 7. LEGEND CLICKS (Income/Expense Details Redirect) ---
-        // --- 7. LEGEND CLICKS (Income/Expense Details Redirect) ---
-        view.findViewById(R.id.btnLegendIncome).setOnClickListener(v -> {
-            getParentFragmentManager().beginTransaction()
-                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                    // Pass TRUE for Income, along with the currently selected year/month!
-                    .replace(R.id.fragment_container, new TransactionDetailFragment(true, selectedYear, selectedMonth))
-                    .addToBackStack(null).commit();
-        });
-
-        view.findViewById(R.id.btnLegendExpense).setOnClickListener(v -> {
-            getParentFragmentManager().beginTransaction()
-                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                    // Pass FALSE for Expense, along with the currently selected year/month!
-                    .replace(R.id.fragment_container, new TransactionDetailFragment(false, selectedYear, selectedMonth))
-                    .addToBackStack(null).commit();
-        });
-
-        // --- 8. RECYCLER VIEW SETUP ---
+        // --- 7. RECYCLER VIEW SETUP ---
         RecyclerView recyclerView = view.findViewById(R.id.recyclerViewTransactions);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
@@ -172,13 +164,23 @@ public class HomeFragment extends Fragment {
         });
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        // --- 9. FETCH WALLETS (NET WORTH) ---
+        // --- 8. FETCH WALLETS (NET WORTH) ---
         viewModel.getAllAccounts().observe(getViewLifecycleOwner(), accounts -> {
             if (accounts != null) {
                 adapter.setAccounts(accounts);
                 currentNetWorth = 0;
                 for (Account acc : accounts) currentNetWorth += acc.getCurrentBalance();
                 updateBalanceTexts();
+            }
+        });
+
+        // --- 9. [RESTORED] DEFAULT CATEGORIES GENERATOR ---
+        viewModel.getAllCategories().observe(getViewLifecycleOwner(), categories -> {
+            if (categories != null && categories.isEmpty()) {
+                viewModel.insertCategory(new Category(null, "Food & Drinks", "Expense", "#F44336", "ic_food", 300.0, "Daily"));
+                viewModel.insertCategory(new Category(null, "Transport", "Expense", "#2196F3", "ic_transport", 100.0, "Daily"));
+                viewModel.insertCategory(new Category(null, "Rent", "Expense", "#9C27B0", "ic_home", 5000.0, "Monthly"));
+                viewModel.insertCategory(new Category(null, "Salary", "Income", "#4CAF50", "ic_salary", 0.0, "Monthly"));
             }
         });
 
@@ -218,6 +220,12 @@ public class HomeFragment extends Fragment {
         String lastShownDate = prefs.getString("last_daily_summary", "");
 
         if (!todayDateStr.equals(lastShownDate) || isManualClick) {
+
+            // --- NEW: PLAY THE SOUND ALARM! ---
+            if (!isManualClick) { // Don't beep if they manually clicked the bell, only beep for the automatic popup!
+                com.example.endekise.utils.SoundUtils.playNotificationAlarm(requireContext());
+            }
+
             new MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Today's Summary 📅")
                     .setMessage(String.format(Locale.getDefault(), "Income: ETB %,.2f\nExpenses: ETB %,.2f", todayIncome, todayExpense))
@@ -253,6 +261,7 @@ public class HomeFragment extends Fragment {
     private void updateDashboardData() {
         if (allTransactions == null || barChart == null) return;
 
+        // [RESTORED] Changed to 5 weeks to prevent end-of-month data from disappearing!
         float[] weeklyIncome = new float[5], weeklyExpense = new float[5];
         currentMonthlyIncome = 0; currentMonthlyExpense = 0; todayIncome = 0; todayExpense = 0;
 
@@ -272,10 +281,13 @@ public class HomeFragment extends Fragment {
         }
 
         if (notificationDot != null) notificationDot.setVisibility((todayIncome > 0 || todayExpense > 0) ? View.VISIBLE : View.GONE);
-        updateBalanceTexts(); // Applies privacy mode automatically!
+        updateBalanceTexts();
 
         List<com.github.mikephil.charting.data.BarEntry> entriesIncome = new ArrayList<>(), entriesExpense = new ArrayList<>();
-        for (int i = 0; i < 4; i++) { entriesIncome.add(new com.github.mikephil.charting.data.BarEntry(i, weeklyIncome[i])); entriesExpense.add(new com.github.mikephil.charting.data.BarEntry(i, weeklyExpense[i])); }
+        for (int i = 0; i < 5; i++) { // Generate 5 weeks to match the X-Axis labels!
+            entriesIncome.add(new com.github.mikephil.charting.data.BarEntry(i, weeklyIncome[i]));
+            entriesExpense.add(new com.github.mikephil.charting.data.BarEntry(i, weeklyExpense[i]));
+        }
 
         com.github.mikephil.charting.data.BarDataSet setIncome = new com.github.mikephil.charting.data.BarDataSet(entriesIncome, "Income");
         setIncome.setColor(android.graphics.Color.parseColor("#7C4DFF")); setIncome.setDrawValues(false);
@@ -283,8 +295,11 @@ public class HomeFragment extends Fragment {
         setExpense.setColor(android.graphics.Color.parseColor("#FF6D00")); setExpense.setDrawValues(false);
 
         com.github.mikephil.charting.data.BarData barData = new com.github.mikephil.charting.data.BarData(setIncome, setExpense);
-        barData.setBarWidth(0.25f); barChart.setData(barData);
-        barChart.getXAxis().setAxisMinimum(0f); barChart.getXAxis().setAxisMaximum(barChart.getBarData().getGroupWidth(0.4f, 0.05f) * 4);
-        barChart.groupBars(0f, 0.4f, 0.05f); barChart.invalidate(); barChart.animateY(1000, com.github.mikephil.charting.animation.Easing.EaseInOutQuad);
+        float groupSpace = 0.4f, barSpace = 0.05f, barWidth = 0.25f;
+
+        barData.setBarWidth(barWidth); barChart.setData(barData);
+        barChart.getXAxis().setAxisMinimum(0f);
+        barChart.getXAxis().setAxisMaximum(0f + barChart.getBarData().getGroupWidth(groupSpace, barSpace) * 5); // Scale for 5 weeks!
+        barChart.groupBars(0f, groupSpace, barSpace); barChart.invalidate(); barChart.animateY(1000, com.github.mikephil.charting.animation.Easing.EaseInOutQuad);
     }
 }

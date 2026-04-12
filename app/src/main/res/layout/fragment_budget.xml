@@ -148,7 +148,12 @@
                 app:cardCornerRadius="20dp"
                 app:cardBackgroundColor="#FF6D00">
                 <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="16dp">
-                    <TextView android:id="@+id/labelExpense" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Expense" android:textColor="#FFF3E0"/>
+                    <TextView
+                        android:id="@+id/labelExpense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total Expense"
+                        android:textColor="#FFF3E0"/>
                     <TextView android:id="@+id/textBudgetExpense" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/labelExpense" android:text="ETB 0" android:textColor="#FFFFFF" android:textSize="20sp" android:textStyle="bold" android:layout_marginTop="8dp" android:layout_marginBottom="8dp"/>
                 </RelativeLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -165,7 +170,14 @@
             android:layout_marginTop="32dp"
             android:layout_marginBottom="12dp">
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Expenses" android:textSize="18sp" android:textStyle="bold" android:textColor="@android:color/black" android:layout_centerVertical="true"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Expenses"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_centerVertical="true"/>
 
             <!-- The Add Category Button -->
             <com.google.android.material.card.MaterialCardView
