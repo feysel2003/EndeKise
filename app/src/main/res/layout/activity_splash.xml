@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF6D00"> <!-- Premium Deep Orange Background -->
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.45">
+
+        <!-- The App Logo (Initially invisible for animation) -->
+        <ImageView
+            android:id="@+id/imgSplashLogo"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_custom_launcher_foreground"
+            android:alpha="0"
+            android:scaleX="0.5"
+            android:scaleY="0.5"/>
+
+        <!-- The App Name (Initially invisible) -->
+        <TextView
+            android:id="@+id/textSplashTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="EndeKise"
+            android:textColor="#FFFFFF"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            android:alpha="0"
+            android:translationY="50dp"/>
+
+    </LinearLayout>
+
+    <!-- Small branding text at the absolute bottom -->
+    <TextView
+        android:id="@+id/textBranding"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Smart Financial Tracker"
+        android:textColor="#E0FFFFFF"
+        android:textSize="12sp"
+        android:letterSpacing="0.2"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:alpha="0"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

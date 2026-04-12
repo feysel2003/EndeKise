@@ -201,6 +201,8 @@ public class BudgetFragment extends Fragment {
     }
 
     // --- SMART CALCULATOR (DAILY VS MONTHLY MATH) ---
+    // --- THE BULLETPROOF CALCULATOR & ALARM ENGINE ---
+    // --- SMART CALCULATOR & ALARM ENGINE ---
     private void calculateAndDisplayData() {
         if (allTransactions == null || allCategories == null) return;
 
@@ -215,6 +217,7 @@ public class BudgetFragment extends Fragment {
         Calendar currentMonthCal = Calendar.getInstance();
         int todayDayOfYear = currentMonthCal.get(Calendar.DAY_OF_YEAR);
 
+        // 1. Calculate all spending totals
         for (Transaction t : allTransactions) {
             Calendar txCal = Calendar.getInstance();
             txCal.setTimeInMillis(t.getDateTimestamp());
@@ -249,12 +252,13 @@ public class BudgetFragment extends Fragment {
             }
         }
 
-        // Update Top Purple/Orange Cards
+        // 2. Update Top Purple/Orange Cards
         textIncome.setText(String.format(Locale.getDefault(), "ETB %,.2f", totalIncome));
         textExpense.setText(String.format(Locale.getDefault(), "ETB %,.2f", totalExpense));
 
-        // Format data for the Adapter
+        // 3. Format data for the Adapter & Check Alarms!
         double[] finalSpends = new double[allCategories.size()];
+        android.content.SharedPreferences prefs = requireActivity().getSharedPreferences("EndeKisePrefs", android.content.Context.MODE_PRIVATE);
 
         for (int i = 0; i < allCategories.size(); i++) {
             Category cat = allCategories.get(i);
@@ -267,45 +271,45 @@ public class BudgetFragment extends Fragment {
                 finalSpends[i] = categorySpendsMonthly[i];
             }
 
-            // 90% Alert Logic & Sound Alarm!
-            // --- FIXED 90% ALERT ALARM LOGIC ---
+
+            // --- BULLETPROOF 90% ALARM LOGIC ---
             if (cat.getType().equalsIgnoreCase("Expense") && cat.getBudgetLimit() > 0) {
                 double percent = (finalSpends[i] / cat.getBudgetLimit()) * 100;
-
-                android.content.SharedPreferences prefs = requireActivity().getSharedPreferences("EndeKisePrefs", android.content.Context.MODE_PRIVATE);
-                String warningKey = "warned_90_" + cat.getName() + "_" + period; // E.g., "warned_90_Food_Daily"
+                String warningKey = "warned_90_" + cat.getName() + "_" + period;
 
                 if (percent >= 90.0) {
                     String alertMsg = "🚨 " + cat.getName() + " (" + period + ") is at " + String.format(Locale.getDefault(), "%.1f%%", percent) + " of its budget!";
                     alertMessages.add(alertMsg);
 
-                    // Did we ALREADY warn them today/this month?
-                    boolean alreadyWarned = prefs.getBoolean(warningKey, false);
+                    // Check memory. Have we warned them?
+                    if (!prefs.getBoolean(warningKey, false)) {
 
-                    if (!alreadyWarned) {
-                        // 1. PLAY SOUND (Only once!)
-                        com.example.endekise.utils.SoundUtils.playNotificationAlarm(requireContext());
-
-                        // 2. SAVE FLAG IMMEDIATELY SO IT NEVER PLAYS AGAIN FOR THIS CATEGORY
+                        // 1. SAVE THE FLAG IMMEDIATELY.
                         prefs.edit().putBoolean(warningKey, true).apply();
 
-                        // 3. SHOW POPUP
-                        new MaterialAlertDialogBuilder(requireContext())
+                        // 2. PLAY SOUND & SHOW POPUP
+                        com.example.endekise.utils.SoundUtils.playLoopingAlarm(requireContext());
+
+                        new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                                 .setTitle("Budget Alert! ⚠️")
                                 .setMessage(alertMsg)
-                                .setPositiveButton("I'll be careful", null)
+                                .setCancelable(false)
+                                .setPositiveButton("I'll be careful", (dialog, which) -> {
+                                    com.example.endekise.utils.SoundUtils.stopAlarm();
+                                })
                                 .show();
                     }
-                } else if (percent < 90.0) {
-                    // IF they delete an expense and drop below 90%, we reset the flag so it can warn them again in the future!
+                } else {
+                    // Safe zone! Reset the flag!
                     prefs.edit().putBoolean(warningKey, false).apply();
                 }
             }
         }
 
+        // Show or hide the Red Dot on the Bell
         notificationDot.setVisibility(alertMessages.isEmpty() ? View.GONE : View.VISIBLE);
 
-        // Pass calculated data to Adapter
+        // Pass calculated data to Adapter to draw the progress bars
         categoryAdapter.setData(allCategories, finalSpends);
     }
 
