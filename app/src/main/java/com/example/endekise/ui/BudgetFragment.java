@@ -153,42 +153,48 @@ public class BudgetFragment extends Fragment {
         MaterialAutoCompleteTextView dropdownType = dialogView.findViewById(R.id.dropdownCategoryType);
         View btnSave = dialogView.findViewById(R.id.btnSaveCategory);
 
+        // Type Dropdown (Income/Expense)
         String[] types = new String[]{"Expense", "Income"};
         ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, types);
         dropdownType.setAdapter(typeAdapter);
 
+        // NEW: Period Dropdown (Daily/Monthly)
+        MaterialAutoCompleteTextView dropdownPeriod = dialogView.findViewById(R.id.dropdownBudgetPeriod);
+        String[] periods = new String[]{"Daily", "Monthly"};
+        ArrayAdapter<String> periodAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_dropdown_item_1line, periods);
+        dropdownPeriod.setAdapter(periodAdapter);
+
         if (existingCategory == null) {
             textTitle.setText("New Category");
             dropdownType.setText("Expense", false);
+            dropdownPeriod.setText("Monthly", false); // Default to Monthly
         } else {
             textTitle.setText("Edit Budget Limit");
             editName.setText(existingCategory.getName());
-            editName.setEnabled(false); // Don't let them rename it here to avoid DB confusion
+            editName.setEnabled(false);
             dropdownType.setText(existingCategory.getType(), false);
             dropdownType.setEnabled(false);
             editLimit.setText(String.valueOf(existingCategory.getBudgetLimit()));
+            dropdownPeriod.setText(existingCategory.getBudgetPeriod() != null ? existingCategory.getBudgetPeriod() : "Monthly", false);
         }
 
         btnSave.setOnClickListener(v -> {
             String name = editName.getText().toString().trim();
             String limitStr = editLimit.getText().toString().trim();
             String type = dropdownType.getText().toString().trim();
+            String period = dropdownPeriod.getText().toString().trim(); // Get the selected period!
 
-            if (name.isEmpty()) {
-                editName.setError("Required");
-                return;
-            }
-
+            if (name.isEmpty()) { editName.setError("Required"); return; }
             double limit = limitStr.isEmpty() ? 0.0 : Double.parseDouble(limitStr);
 
             if (existingCategory == null) {
-                // ADD NEW
-                Category newCat = new Category(null, name, type, "#7C4DFF", "ic_general", limit);
+                // Pass the PERIOD to the new constructor!
+                Category newCat = new Category(null, name, type, "#7C4DFF", "ic_general", limit, period);
                 viewModel.insertCategory(newCat);
                 Toast.makeText(getContext(), "Category created!", Toast.LENGTH_SHORT).show();
             } else {
-                // UPDATE EXISTING
                 existingCategory.setBudgetLimit(limit);
+                existingCategory.setBudgetPeriod(period); // Update the period!
                 viewModel.updateCategory(existingCategory);
                 Toast.makeText(getContext(), "Budget updated!", Toast.LENGTH_SHORT).show();
             }
@@ -202,30 +208,50 @@ public class BudgetFragment extends Fragment {
 
         double totalIncome = 0;
         double totalExpense = 0;
-        double[] categorySpends = new double[allCategories.size()];
-        alertMessages.clear(); // Clear old alerts
+
+        // We now track TWO arrays: One for daily spending, one for monthly spending!
+        double[] categorySpendsDaily = new double[allCategories.size()];
+        double[] categorySpendsMonthly = new double[allCategories.size()];
+
+        alertMessages.clear();
 
         Calendar currentMonthCal = Calendar.getInstance();
+        int todayDayOfYear = currentMonthCal.get(Calendar.DAY_OF_YEAR);
 
         for (Transaction t : allTransactions) {
             Calendar txCal = Calendar.getInstance();
             txCal.setTimeInMillis(t.getDateTimestamp());
 
+            boolean isThisMonth = (txCal.get(Calendar.MONTH) == currentMonthCal.get(Calendar.MONTH) && txCal.get(Calendar.YEAR) == currentMonthCal.get(Calendar.YEAR));
+            boolean isToday = (txCal.get(Calendar.DAY_OF_YEAR) == todayDayOfYear && txCal.get(Calendar.YEAR) == currentMonthCal.get(Calendar.YEAR));
+            boolean isSelectedDay = selectedDate != null && (txCal.get(Calendar.DAY_OF_YEAR) == selectedDate.get(Calendar.DAY_OF_YEAR) && txCal.get(Calendar.YEAR) == selectedDate.get(Calendar.YEAR));
+
+            // Global Cards (Income/Expense at the top) only show data for the selected filter
+            boolean includeInGlobalTotals = false;
             if (selectedDate != null) {
-                if (txCal.get(Calendar.DAY_OF_YEAR) != selectedDate.get(Calendar.DAY_OF_YEAR) || txCal.get(Calendar.YEAR) != selectedDate.get(Calendar.YEAR)) continue;
+                includeInGlobalTotals = isSelectedDay;
             } else {
-                if (txCal.get(Calendar.MONTH) != currentMonthCal.get(Calendar.MONTH) || txCal.get(Calendar.YEAR) != currentMonthCal.get(Calendar.YEAR)) continue;
+                includeInGlobalTotals = isThisMonth;
             }
 
             if (t.getAmount() > 0) {
-                totalIncome += t.getAmount();
+                if (includeInGlobalTotals) totalIncome += t.getAmount();
             } else {
                 double absoluteExpense = Math.abs(t.getAmount());
-                totalExpense += absoluteExpense;
+                if (includeInGlobalTotals) totalExpense += absoluteExpense;
 
+                // Track Category Spending (Regardless of the global filter, we need to know their total daily and monthly spend for the progress bars!)
                 for (int i = 0; i < allCategories.size(); i++) {
                     if (allCategories.get(i).getName().equalsIgnoreCase(t.getPayee())) {
-                        categorySpends[i] += absoluteExpense;
+
+                        if (isThisMonth) categorySpendsMonthly[i] += absoluteExpense;
+
+                        // If they selected a specific day on the calendar, use that day for "Daily". Otherwise, use "Today".
+                        if (selectedDate != null && isSelectedDay) {
+                            categorySpendsDaily[i] += absoluteExpense;
+                        } else if (selectedDate == null && isToday) {
+                            categorySpendsDaily[i] += absoluteExpense;
+                        }
                         break;
                     }
                 }
@@ -235,21 +261,32 @@ public class BudgetFragment extends Fragment {
         textIncome.setText(String.format(Locale.getDefault(), "ETB %,.2f", totalIncome));
         textExpense.setText(String.format(Locale.getDefault(), "ETB %,.2f", totalExpense));
 
-        // --- CHECK 90% NOTIFICATION ALERTS ---
+        // Create a single array of "Final Spends" based on the category's period setting
+        double[] finalSpends = new double[allCategories.size()];
+
         for (int i = 0; i < allCategories.size(); i++) {
             Category cat = allCategories.get(i);
+
+            // If it's a Daily budget, use the Daily spend. If Monthly, use Monthly!
+            if ("Daily".equalsIgnoreCase(cat.getBudgetPeriod())) {
+                finalSpends[i] = categorySpendsDaily[i];
+            } else {
+                finalSpends[i] = categorySpendsMonthly[i];
+            }
+
+            // 90% Alert Logic
             if (cat.getType().equalsIgnoreCase("Expense") && cat.getBudgetLimit() > 0) {
-                double percent = (categorySpends[i] / cat.getBudgetLimit()) * 100;
+                double percent = (finalSpends[i] / cat.getBudgetLimit()) * 100;
                 if (percent >= 90.0) {
-                    alertMessages.add("🚨 " + cat.getName() + " is at " + String.format(Locale.getDefault(), "%.1f%%", percent) + " of its budget! (" + String.format(Locale.getDefault(), "ETB %,.0f", categorySpends[i]) + " spent).");
+                    alertMessages.add("🚨 " + cat.getName() + " (" + cat.getBudgetPeriod() + ") is at " + String.format(Locale.getDefault(), "%.1f%%", percent) + " of its budget!");
                 }
             }
         }
 
-        // Turn Red Dot on or off!
         notificationDot.setVisibility(alertMessages.isEmpty() ? View.GONE : View.VISIBLE);
 
-        categoryAdapter.setData(allCategories, categorySpends);
+        // Pass the smart calculations to the adapter!
+        categoryAdapter.setData(allCategories, finalSpends);
     }
 
     class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.DayViewHolder> {
@@ -308,8 +345,7 @@ public class BudgetFragment extends Fragment {
 
             holder.textCategoryName.setText(cat.getName());
             holder.textSpend.setText(String.format(Locale.getDefault(), "ETB %,.0f", spent));
-            holder.textLimit.setText(String.format(Locale.getDefault(), "ETB %,.0f", cat.getBudgetLimit()));
-            holder.textCategoryDate.setText(new SimpleDateFormat("MMMM, yyyy", Locale.getDefault()).format(selectedDate == null ? Calendar.getInstance().getTime() : selectedDate.getTime()));
+            holder.textLimit.setText(String.format(Locale.getDefault(), "ETB %,.0f (%s)", limit, cat.getBudgetPeriod()));            holder.textCategoryDate.setText(new SimpleDateFormat("MMMM, yyyy", Locale.getDefault()).format(selectedDate == null ? Calendar.getInstance().getTime() : selectedDate.getTime()));
 
             holder.progress.setMax((int) limit);
             holder.progress.setProgressCompat((int) spent, true);

@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
 
 @Database(
         entities = {Account.class, Budget.class, Category.class, Tag.class, Transaction.class, TransactionSplit.class, TransactionTag.class},
-        version = 3,
+        version = 4,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {

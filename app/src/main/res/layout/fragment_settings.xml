@@ -119,12 +119,13 @@
 
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" android:layout_marginStart="56dp"/>
 
-                <!-- Dark Mode Toggle -->
-                <RelativeLayout android:layout_width="match_parent" android:layout_height="60dp" android:paddingHorizontal="16dp">
-                    <ImageView android:id="@+id/iconDark" android:layout_width="24dp" android:layout_height="24dp" android:layout_centerVertical="true" android:src="@android:drawable/ic_menu_gallery" app:tint="#7C4DFF" />
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_marginStart="16dp" android:layout_toEndOf="@id/iconDark" android:text="Dark Mode" android:textColor="#212121" android:textSize="16sp" />
-                    <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/switchDarkMode" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true" />
-                </RelativeLayout>
+<!--                &lt;!&ndash; Dark Mode Toggle &ndash;&gt;-->
+<!--                <RelativeLayout android:layout_width="match_parent" android:layout_height="60dp" android:paddingHorizontal="16dp">-->
+<!--                    <ImageView android:id="@+id/iconDark" android:layout_width="24dp" android:layout_height="24dp" android:layout_centerVertical="true" android:src="@android:drawable/ic_menu_gallery" app:tint="#7C4DFF" />-->
+<!--                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_marginStart="16dp" android:layout_toEndOf="@id/iconDark" android:text="Dark Mode" android:textColor="#212121" android:textSize="16sp" />-->
+<!--                    <com.google.android.material.switchmaterial.SwitchMaterial android:id="@+id/switchDarkMode" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true" />-->
+<!--                </RelativeLayout>-->
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

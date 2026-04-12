@@ -14,21 +14,26 @@ public class Category {
     private String colorHex;
     private String iconName;
     private double budgetLimit; // --- NEW FIELD! ---
+    private String budgetPeriod; // --- NEW FIELD! ("Daily" or "Monthly") ---
 
     // Constructor
-    public Category(Integer parentCategoryId, String name, String type, String colorHex, String iconName, double budgetLimit) {
+    // Update Constructor
+    public Category(Integer parentCategoryId, String name, String type, String colorHex, String iconName, double budgetLimit, String budgetPeriod) {
         this.parentCategoryId = parentCategoryId;
         this.name = name;
         this.type = type;
         this.colorHex = colorHex;
         this.iconName = iconName;
         this.budgetLimit = budgetLimit;
+        this.budgetPeriod = budgetPeriod;
     }
 
     // Getters and Setters
     public int getCategoryId() { return categoryId; }
     public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
-
+    // Add Getter and Setter
+    public String getBudgetPeriod() { return budgetPeriod; }
+    public void setBudgetPeriod(String budgetPeriod) { this.budgetPeriod = budgetPeriod; }
     public Integer getParentCategoryId() { return parentCategoryId; }
     public void setParentCategoryId(Integer parentCategoryId) { this.parentCategoryId = parentCategoryId; }
 

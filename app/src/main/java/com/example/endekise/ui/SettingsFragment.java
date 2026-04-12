@@ -61,29 +61,28 @@ public class SettingsFragment extends Fragment {
             new ProfileBottomSheet().show(getParentFragmentManager(), "ProfileBottomSheet");
         });
 
-        // --- 2. SECURITY & APPEARANCE ---
+        // --- 2. SECURITY SETUP ---
         SwitchMaterial switchPinLock = view.findViewById(R.id.switchPinLock);
-        SwitchMaterial switchDarkMode = view.findViewById(R.id.switchDarkMode);
 
-        // Load current states
-        switchPinLock.setChecked(prefs.getString("user_pin", "").length() == 4);
-        switchDarkMode.setChecked(prefs.getBoolean("is_dark_mode", false));
+        // Does the user have the lock turned on?
+        boolean isLocked = prefs.getBoolean("is_app_locked", false);
+        switchPinLock.setChecked(isLocked);
 
         switchPinLock.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (!isChecked) {
-                // Remove PIN
-                prefs.edit().putString("user_pin", "").apply();
-                Toast.makeText(getContext(), "PIN Lock Disabled", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(getContext(), "Logout and restart app to set new PIN", Toast.LENGTH_LONG).show();
-            }
-        });
+            prefs.edit().putBoolean("is_app_locked", isChecked).apply();
 
-        switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            prefs.edit().putBoolean("is_dark_mode", isChecked).apply();
-            androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
-                    isChecked ? androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
-                            : androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO);
+            if (isChecked) {
+                // If they don't have a PIN yet, force them to make one!
+                if (prefs.getString("user_pin", "").isEmpty()) {
+                    Toast.makeText(getContext(), "Please create a PIN first!", Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(getActivity(), PinLockActivity.class));
+                    requireActivity().finish();
+                } else {
+                    Toast.makeText(getContext(), "App Lock Enabled! PIN required on next launch.", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(getContext(), "App Lock Disabled", Toast.LENGTH_SHORT).show();
+            }
         });
 
         // --- 3. DATA & BACKUP ---
@@ -119,26 +118,24 @@ public class SettingsFragment extends Fragment {
         });
     }
 
-    // --- CSV EXPORT LOGIC ---
+    // --- REAL ENTERPRISE CSV EXPORT LOGIC ---
     private void exportDataToCSV() {
         if (allTransactions == null || allTransactions.isEmpty()) {
             Toast.makeText(getContext(), "No data to export", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // 1. Build the CSV Content
         StringBuilder csvData = new StringBuilder();
-        // CSV Header
-        csvData.append("Date,Category,Type,Amount,Note\n");
-
+        csvData.append("Date,Category,Type,Amount,Note\n"); // The Headers
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
 
         for (Transaction t : allTransactions) {
             String date = sdf.format(new Date(t.getDateTimestamp()));
             String category = t.getPayee() != null ? t.getPayee() : "General";
             String type = t.getAmount() > 0 ? "Income" : "Expense";
-            String note = t.getNote() != null ? t.getNote().replace(",", " ") : ""; // Remove commas to prevent CSV breaking
+            String note = t.getNote() != null ? t.getNote().replace(",", " ") : ""; // Remove commas so it doesn't break Excel columns!
 
-            // Append row
             csvData.append(date).append(",")
                     .append(category).append(",")
                     .append(type).append(",")
@@ -146,14 +143,37 @@ public class SettingsFragment extends Fragment {
                     .append(note).append("\n");
         }
 
-        // Share the CSV text instantly to WhatsApp, Telegram, Email, etc!
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "Here is my EndeKise Export Data:\n\n" + csvData.toString());
-        sendIntent.setType("text/plain");
+        // 2. Save the file to the Android "Downloads" folder!
+        try {
+            String fileName = "EndeKise_Export_" + System.currentTimeMillis() + ".csv";
 
-        Intent shareIntent = Intent.createChooser(sendIntent, "Export Transactions via...");
-        startActivity(shareIntent);
+            android.content.ContentValues values = new android.content.ContentValues();
+            values.put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+            values.put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "text/csv");
+            values.put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, android.os.Environment.DIRECTORY_DOWNLOADS);
+
+            Uri uri = requireContext().getContentResolver().insert(android.provider.MediaStore.Files.getContentUri("external"), values);
+
+            if (uri != null) {
+                java.io.OutputStream outputStream = requireContext().getContentResolver().openOutputStream(uri);
+                if (outputStream != null) {
+                    outputStream.write(csvData.toString().getBytes());
+                    outputStream.close();
+
+                    // Show a beautiful success message!
+                    new MaterialAlertDialogBuilder(requireContext())
+                            .setTitle("Export Successful ✅")
+                            .setMessage("Your transaction history has been saved as a .csv file in your phone's Downloads folder!\n\nFile: " + fileName)
+                            .setPositiveButton("Awesome", null)
+                            .show();
+                }
+            } else {
+                Toast.makeText(getContext(), "Failed to create file.", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Export Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 
     // --- CONTACT US LOGIC (Intents) ---
