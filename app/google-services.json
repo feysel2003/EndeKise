@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "326048614884",
+    "project_id": "endekise-c1a55",
+    "storage_bucket": "endekise-c1a55.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:326048614884:android:f267b0ebf8830c1e591ff1",
+        "android_client_info": {
+          "package_name": "com.example.endekise"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "326048614884-uhmptukg91q0eh5oppitckc40m4pdpa6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.endekise",
+            "certificate_hash": "563b60506ffb0a67072b1669ccaf33d3e9efc854"
+          }
+        },
+        {
+          "client_id": "326048614884-mkb97qbm25he8vfv6potob94jatab6t8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCr8M_Tf5VfLGuZfaLADAEUAe9depDsghA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "326048614884-mkb97qbm25he8vfv6potob94jatab6t8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

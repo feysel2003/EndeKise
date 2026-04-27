@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -40,24 +41,26 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
-    // MPAndroidChart for Analytics
+
+    // --- FIREBASE (Real Cloud Sync & Auth) ---
+    implementation platform('com.google.firebase:firebase-bom:33.0.0')
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.android.gms:play-services-auth:21.0.0'
+
+    // --- UI & CHARTS ---
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation "com.google.android.material:material:1.11.0"
 
-    // --- EXPENSE TRACKER PRO DEPENDENCIES ---
-
-    // 1. Room Database (Crucial: Using annotationProcessor for Java)
+    // --- ROOM DATABASE (Local Storage) ---
     def room_version = "2.6.1"
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
-    // 2. Lifecycle Components (For MVVM Architecture in Java)
+    // --- ARCHITECTURE ---
     def lifecycle_version = "2.7.0"
     implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
 
-    // 3. Material Design 3 (For frictionless UI, BottomSheets, and Floating Action Buttons)
-    implementation "com.google.android.material:material:1.11.0"
-
-    // 4. Gson (For easily converting JSON/Lists if we need complex offline storage later)
     implementation "com.google.code.gson:gson:2.10.1"
 }

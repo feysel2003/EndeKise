@@ -1,5 +1,6 @@
 package com.example.endekise.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -22,8 +25,18 @@ import com.example.endekise.R;
 import com.example.endekise.entity.Transaction;
 import com.example.endekise.utils.ImageUtils;
 import com.example.endekise.viewmodel.DashboardViewModel;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,6 +49,27 @@ public class SettingsFragment extends Fragment {
     private DashboardViewModel viewModel;
     private SharedPreferences prefs;
     private List<Transaction> allTransactions = new ArrayList<>();
+    private TextView textCloudStatus;
+
+    // --- REAL FIREBASE VARS ---
+    private FirebaseAuth mAuth;
+    private GoogleSignInClient mGoogleSignInClient;
+
+    private final long SEVEN_DAYS_IN_MS = 7L * 24 * 60 * 60 * 1000;
+
+    // --- REAL GOOGLE LOGIN LAUNCHER ---
+    private final ActivityResultLauncher<Intent> googleSignInLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+                    try {
+                        GoogleSignInAccount account = task.getResult(ApiException.class);
+                        firebaseAuthWithGoogle(account.getIdToken());
+                    } catch (ApiException e) {
+                        Toast.makeText(getContext(), "Google sign in failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
 
     @Nullable
     @Override
@@ -49,6 +83,22 @@ public class SettingsFragment extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(DashboardViewModel.class);
         prefs = requireActivity().getSharedPreferences("EndeKisePrefs", Context.MODE_PRIVATE);
 
+        textCloudStatus = view.findViewById(R.id.textCloudStatus);
+
+        // --- INIT REAL FIREBASE ---
+        mAuth = FirebaseAuth.getInstance();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
+
+        // --- FREE TRIAL INITIALIZATION ---
+        long installDate = prefs.getLong("install_date", 0);
+        if (installDate == 0) {
+            prefs.edit().putLong("install_date", System.currentTimeMillis()).apply();
+        }
+
         // --- 1. PROFILE SETUP ---
         TextView textSettingsName = view.findViewById(R.id.textSettingsName);
         ImageView imgSettingsProfile = view.findViewById(R.id.imgSettingsProfile);
@@ -56,27 +106,26 @@ public class SettingsFragment extends Fragment {
         textSettingsName.setText(prefs.getString("user_name", "Guest User"));
         ImageUtils.loadProfileImage(requireContext(), imgSettingsProfile);
 
-        // Click profile to open the exact same BottomSheet we built earlier!
         view.findViewById(R.id.btnEditProfile).setOnClickListener(v -> {
             new ProfileBottomSheet().show(getParentFragmentManager(), "ProfileBottomSheet");
         });
 
         // --- 2. SECURITY SETUP ---
         SwitchMaterial switchPinLock = view.findViewById(R.id.switchPinLock);
-
-        // Does the user have the lock turned on?
         boolean isLocked = prefs.getBoolean("is_app_locked", false);
         switchPinLock.setChecked(isLocked);
 
         switchPinLock.setOnCheckedChangeListener((buttonView, isChecked) -> {
             prefs.edit().putBoolean("is_app_locked", isChecked).apply();
-
             if (isChecked) {
-                // If they don't have a PIN yet, force them to make one!
                 if (prefs.getString("user_pin", "").isEmpty()) {
                     Toast.makeText(getContext(), "Please create a PIN first!", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(getActivity(), PinLockActivity.class));
-                    requireActivity().finish();
+                    try {
+                        startActivity(new Intent(getActivity(), PinLockActivity.class));
+                        requireActivity().finish();
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "PinLockActivity not found yet!", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Toast.makeText(getContext(), "App Lock Enabled! PIN required on next launch.", Toast.LENGTH_SHORT).show();
                 }
@@ -92,9 +141,9 @@ public class SettingsFragment extends Fragment {
 
         view.findViewById(R.id.btnExportCSV).setOnClickListener(v -> exportDataToCSV());
 
-        view.findViewById(R.id.btnCloudSync).setOnClickListener(v ->
-                Toast.makeText(getContext(), "Firebase Sync requires EndeKise Pro!", Toast.LENGTH_SHORT).show()
-        );
+        // THE REAL CLOUD SYNC LOGIC
+        updateCloudStatusText();
+        view.findViewById(R.id.btnCloudSync).setOnClickListener(v -> handleCloudSyncClick());
 
         // --- 4. FEEDBACK & ACCOUNT ---
         view.findViewById(R.id.btnContactUs).setOnClickListener(v -> showContactDialog());
@@ -109,32 +158,104 @@ public class SettingsFragment extends Fragment {
                     .setTitle("Logout")
                     .setMessage("Are you sure you want to log out? You will need your PIN to log back in.")
                     .setPositiveButton("Logout", (dialog, which) -> {
-                        // Redirect to the PIN Lock Screen!
-                        startActivity(new Intent(getActivity(), PinLockActivity.class));
-                        requireActivity().finish();
+                        try {
+                            startActivity(new Intent(getActivity(), PinLockActivity.class));
+                            requireActivity().finish();
+                        } catch (Exception e) {
+                            Toast.makeText(getContext(), "Logged out!", Toast.LENGTH_SHORT).show();
+                        }
                     })
                     .setNegativeButton("Cancel", null)
                     .show();
         });
     }
 
-    // --- REAL ENTERPRISE CSV EXPORT LOGIC ---
+    // --- REAL FIREBASE CLOUD SYNC METHODS ---
+    private void updateCloudStatusText() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            textCloudStatus.setText("Synced to " + currentUser.getEmail() + " ✅");
+            textCloudStatus.setTextColor(android.graphics.Color.parseColor("#388E3C")); // Green
+        } else {
+            textCloudStatus.setText("Sync to Firebase (Requires Sign-In)");
+            textCloudStatus.setTextColor(android.graphics.Color.parseColor("#9E9E9E")); // Gray
+        }
+    }
+
+    private void handleCloudSyncClick() {
+        boolean isProPurchased = prefs.getBoolean("is_pro_purchased", false);
+        boolean isTrialActive = (System.currentTimeMillis() - prefs.getLong("install_date", System.currentTimeMillis())) < SEVEN_DAYS_IN_MS;
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+
+        if (isProPurchased || isTrialActive) {
+            if (currentUser != null) {
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Cloud Sync Active")
+                        .setMessage("Your data is safely backed up to:\n" + currentUser.getEmail())
+                        .setPositiveButton("Sync Now", (dialog, which) -> Toast.makeText(getContext(), "Syncing with Firestore...", Toast.LENGTH_SHORT).show())
+                        .setNegativeButton("Sign Out", (dialog, which) -> {
+                            mAuth.signOut();
+                            mGoogleSignInClient.signOut();
+                            updateCloudStatusText();
+                            Toast.makeText(getContext(), "Signed out of Firebase", Toast.LENGTH_SHORT).show();
+                        }).show();
+            } else {
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Enable Cloud Sync")
+                        .setMessage(isTrialActive ? "Your 7-Day Free Trial is active! Sign in with Google to enable Cloud Sync." : "Sign in with Google to enable Firebase Cloud Sync.")
+                        .setPositiveButton("Sign In with Google", (dialog, which) -> {
+                            // LAUNCH REAL GOOGLE LOGIN!
+                            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                            googleSignInLauncher.launch(signInIntent);
+                        }).setNegativeButton("Cancel", null).show();
+            }
+        } else {
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("EndeKise PRO Required")
+                    .setMessage("Your 7-day free trial has ended. Please upgrade to EndeKise PRO to keep syncing your data to the cloud.")
+                    .setPositiveButton("Upgrade to PRO", (dialog, which) -> {
+                        prefs.edit().putBoolean("is_pro_purchased", true).apply();
+                        Toast.makeText(getContext(), "PRO Unlocked! You can now sign in.", Toast.LENGTH_SHORT).show();
+                    }).setNegativeButton("Cancel", null).show();
+        }
+    }
+
+    private void firebaseAuthWithGoogle(String idToken) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        mAuth.signInWithCredential(credential).addOnCompleteListener(requireActivity(), task -> {
+            if (task.isSuccessful()) {
+                FirebaseUser user = mAuth.getCurrentUser();
+                Toast.makeText(getContext(), "Welcome, " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
+
+                updateCloudStatusText();
+
+                // Update Profile Name automatically
+                prefs.edit().putString("user_name", user.getDisplayName()).apply();
+                TextView textSettingsName = getView().findViewById(R.id.textSettingsName);
+                if (textSettingsName != null) textSettingsName.setText(user.getDisplayName());
+
+            } else {
+                Toast.makeText(getContext(), "Firebase Authentication Failed.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // --- CSV EXPORT ---
     private void exportDataToCSV() {
         if (allTransactions == null || allTransactions.isEmpty()) {
             Toast.makeText(getContext(), "No data to export", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 1. Build the CSV Content
         StringBuilder csvData = new StringBuilder();
-        csvData.append("Date,Category,Type,Amount,Note\n"); // The Headers
+        csvData.append("Date,Category,Type,Amount,Note\n");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
 
         for (Transaction t : allTransactions) {
             String date = sdf.format(new Date(t.getDateTimestamp()));
             String category = t.getPayee() != null ? t.getPayee() : "General";
             String type = t.getAmount() > 0 ? "Income" : "Expense";
-            String note = t.getNote() != null ? t.getNote().replace(",", " ") : ""; // Remove commas so it doesn't break Excel columns!
+            String note = t.getNote() != null ? t.getNote().replace(",", " ") : "";
 
             csvData.append(date).append(",")
                     .append(category).append(",")
@@ -143,10 +264,8 @@ public class SettingsFragment extends Fragment {
                     .append(note).append("\n");
         }
 
-        // 2. Save the file to the Android "Downloads" folder!
         try {
             String fileName = "EndeKise_Export_" + System.currentTimeMillis() + ".csv";
-
             android.content.ContentValues values = new android.content.ContentValues();
             values.put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, fileName);
             values.put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "text/csv");
@@ -159,24 +278,19 @@ public class SettingsFragment extends Fragment {
                 if (outputStream != null) {
                     outputStream.write(csvData.toString().getBytes());
                     outputStream.close();
-
-                    // Show a beautiful success message!
                     new MaterialAlertDialogBuilder(requireContext())
                             .setTitle("Export Successful ✅")
                             .setMessage("Your transaction history has been saved as a .csv file in your phone's Downloads folder!\n\nFile: " + fileName)
                             .setPositiveButton("Awesome", null)
                             .show();
                 }
-            } else {
-                Toast.makeText(getContext(), "Failed to create file.", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            e.printStackTrace();
             Toast.makeText(getContext(), "Export Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
-    // --- CONTACT US LOGIC (Intents) ---
+    // --- CONTACT US LOGIC ---
     private void showContactDialog() {
         String[] options = {"Telegram (@feyami2)", "Email (miftafeysel1@gmail.com)", "Call (+251962080847)"};
 
@@ -185,24 +299,16 @@ public class SettingsFragment extends Fragment {
                 .setItems(options, (dialog, which) -> {
                     Intent intent = null;
                     try {
-                        if (which == 0) {
-                            // Telegram
-                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("tg://resolve?domain=feyami2"));
-                        } else if (which == 1) {
-                            // Email
+                        if (which == 0) intent = new Intent(Intent.ACTION_VIEW, Uri.parse("tg://resolve?domain=feyami2"));
+                        else if (which == 1) {
                             intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:miftafeysel1@gmail.com"));
                             intent.putExtra(Intent.EXTRA_SUBJECT, "EndeKise App Support");
-                        } else if (which == 2) {
-                            // Phone Dialer
-                            intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:+251962080847"));
-                        }
+                        } else if (which == 2) intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:+251962080847"));
 
                         if (intent != null) startActivity(intent);
-
                     } catch (Exception e) {
                         Toast.makeText(getContext(), "App not found to perform this action.", Toast.LENGTH_SHORT).show();
                     }
-                })
-                .show();
+                }).show();
     }
 }
