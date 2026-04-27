@@ -1,5 +1,11 @@
 package com.example.endekise.ui;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
+import com.google.firebase.firestore.DocumentReference;
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -189,16 +195,24 @@ public class SettingsFragment extends Fragment {
 
         if (isProPurchased || isTrialActive) {
             if (currentUser != null) {
+                String[] syncOptions = {"Upload Local Data to Cloud ⬆️", "Download Cloud Data to Phone ⬇️", "Sign Out ❌"};
+
                 new MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("Cloud Sync Active")
-                        .setMessage("Your data is safely backed up to:\n" + currentUser.getEmail())
-                        .setPositiveButton("Sync Now", (dialog, which) -> Toast.makeText(getContext(), "Syncing with Firestore...", Toast.LENGTH_SHORT).show())
-                        .setNegativeButton("Sign Out", (dialog, which) -> {
-                            mAuth.signOut();
-                            mGoogleSignInClient.signOut();
-                            updateCloudStatusText();
-                            Toast.makeText(getContext(), "Signed out of Firebase", Toast.LENGTH_SHORT).show();
-                        }).show();
+                        .setTitle("Cloud Sync Options")
+                        .setItems(syncOptions, (dialog, which) -> {
+                            if (which == 0) {
+                                syncDataToFirestore(); // Upload
+                            } else if (which == 1) {
+                                downloadDataFromFirestore(); // Download
+                            } else if (which == 2) {
+                                // Real Logout
+                                mAuth.signOut();
+                                mGoogleSignInClient.signOut();
+                                updateCloudStatusText();
+                                Toast.makeText(getContext(), "Signed out of Firebase", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .show();
             } else {
                 new MaterialAlertDialogBuilder(requireContext())
                         .setTitle("Enable Cloud Sync")
@@ -237,6 +251,88 @@ public class SettingsFragment extends Fragment {
             } else {
                 Toast.makeText(getContext(), "Firebase Authentication Failed.", Toast.LENGTH_SHORT).show();
             }
+        });
+    }
+
+    // --- REAL FIRESTORE CLOUD DOWNLOAD ---
+    private void downloadDataFromFirestore() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) {
+            Toast.makeText(getContext(), "You must be logged in.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Toast.makeText(getContext(), "Downloading from Cloud... ☁️", Toast.LENGTH_SHORT).show();
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Go to this specific user's cloud folder
+        db.collection("users").document(user.getUid()).collection("transactions")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        Toast.makeText(getContext(), "No cloud data found.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    int restoredCount = 0;
+                    // Loop through the cloud data and save it to our local SQLite Database!
+                    for (com.google.firebase.firestore.DocumentSnapshot doc : queryDocumentSnapshots) {
+                        double amount = doc.getDouble("amount");
+                        long dateTimestamp = doc.getLong("dateTimestamp");
+                        String note = doc.getString("note");
+                        String category = doc.getString("category");
+
+                        // Create the transaction and save it locally!
+                        // Note: We use accountId 1 (default) since we didn't sync wallets yet.
+                        Transaction restoredTx = new Transaction(1, amount, dateTimestamp, note, category, 0.0, 0.0, true);
+                        viewModel.insertTransaction(restoredTx);
+                        restoredCount++;
+                    }
+
+                    Toast.makeText(getContext(), "Restored " + restoredCount + " transactions! ✅", Toast.LENGTH_LONG).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Download Failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+    }
+
+    // --- REAL FIRESTORE CLOUD SYNC ---
+    private void syncDataToFirestore() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null || allTransactions == null || allTransactions.isEmpty()) {
+            Toast.makeText(getContext(), "No data to sync or not logged in.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Toast.makeText(getContext(), "Syncing to Cloud... Please wait.", Toast.LENGTH_SHORT).show();
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // We use a WriteBatch to send all transactions at the exact same time!
+        WriteBatch batch = db.batch();
+
+        for (Transaction t : allTransactions) {
+            Map<String, Object> cloudTransaction = new HashMap<>();
+            cloudTransaction.put("amount", t.getAmount());
+            cloudTransaction.put("dateTimestamp", t.getDateTimestamp());
+            cloudTransaction.put("note", t.getNote() != null ? t.getNote() : "");
+            cloudTransaction.put("category", t.getPayee() != null ? t.getPayee() : "General");
+
+            // Save it under the User's specific Google ID!
+            DocumentReference docRef = db.collection("users")
+                    .document(user.getUid())
+                    .collection("transactions")
+                    .document(String.valueOf(t.getDateTimestamp())); // Use timestamp as unique ID
+
+            batch.set(docRef, cloudTransaction);
+        }
+
+        // Execute the upload
+        batch.commit().addOnSuccessListener(aVoid -> {
+            Toast.makeText(getContext(), "Cloud Sync Successful! ☁️✅", Toast.LENGTH_LONG).show();
+        }).addOnFailureListener(e -> {
+            Toast.makeText(getContext(), "Sync Failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
         });
     }
 
